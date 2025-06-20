@@ -16,7 +16,7 @@
     <template #item="{ item }">
       <view class="waterfall-card" @click="handleClickCard(item)">
         <view class="image-wrapper">
-          <image :src="item['cover_image']" mode="aspectFit" class="cover-image" />
+          <image :src="item['cover_image']" mode="widthFix" class="cover-image" />
         </view>
         <view class="content" style="padding: 10px;">
           <view class="title">{{ item.name }}</view>
