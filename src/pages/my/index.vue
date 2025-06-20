@@ -8,36 +8,54 @@
   <template>
     <view class="mine-page">
       <view class="user-card">
-        <image class="avatar" src="/static/avatar.png" mode="aspectFill" />
+        <image src="/static/logo.png" class="avatar" mode="aspectFit" />
         <view class="nickname">Hi，我的美食记录</view>
       </view>
-
-      <view class="menu-section">
-        <view class="menu-item" @click="goTo('/pages/weekRecipes/index')">
-          <text class="icon">📅</text>
-          <text class="text">每周菜谱</text>
+        <view class="menu-section">
+          <view
+            class="menu-item"
+            v-for="(item, index) in menuList"
+            :key="index"
+            @click="goTo(item.path)"
+          >
+            <text class="icon">{{ item.icon }}</text>
+            <text class="text">{{ item.text }}</text>
+          </view>
         </view>
-        <view class="menu-item" @click="goTo('/pages/toDayRecipes/index')">
-          <text class="icon">📅</text>
-          <text class="text">今日菜谱</text>
-        </view>
-        <view class="menu-item" @click="goTo('/pages/myRecipes/index')">
-          <text class="icon">📖</text>
-          <text class="text">我的菜谱</text>
-        </view>
-
-        <view class="menu-item" @click="goTo('/pages/about/index')">
-          <text class="icon">ℹ️</text>
-          <text class="text">关于项目</text>
-        </view>
-
-
-      </view>
     </view>
   </template>
 
 
 <script setup lang="ts">
+const menuList = [
+  {
+    icon: '📅',
+    text: '每周菜谱',
+    path: '/pages/weekRecipes/index',
+  },
+  {
+    icon: '📅',
+    text: '每周菜谱1',
+    path: '/pages/weekDay/weekDay',
+  },
+  {
+    icon: '📅',
+    text: '今日菜谱',
+    path: '/pages/toDayRecipes/index',
+  },
+  {
+    icon: '📖',
+    text: '我的菜谱',
+    path: '/pages/myRecipes/index',
+  },
+  {
+    icon: 'ℹ️',
+    text: '关于项目',
+    path: '/pages/about/index',
+  },
+
+]
+
 function goTo(url: string) {
   uni.navigateTo({ url })
 }

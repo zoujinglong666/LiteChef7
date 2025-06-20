@@ -101,6 +101,8 @@ export const recipeDatabase: Recipe[] = [
   }
 ];
 
+
+
 export const getRandomRecipes = (count: number = 2): Recipe[] => {
   const shuffled = [...recipeDatabase].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);

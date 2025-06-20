@@ -21,7 +21,7 @@
     </view>
     <wd-popup v-model="show" position="bottom" :safe-area-inset-bottom="true" closable custom-style="height: 90%;"
               @close="handleClose">
-      <iframe
+      <web-view
         :src="webUrl"
         style="width: 100%; height: 100%;"
       />

@@ -30,7 +30,7 @@ export default async({ mode }) => {
     VITE_PROXY_ENABLED,
     VITE_PROXY_PREFIX,
   } = env;
-
+  const { UNI_PLATFORM } = process.env
   return defineConfig({
     // 配置别名
     resolve: {
@@ -86,6 +86,9 @@ export default async({ mode }) => {
         restart: ['vite.config.ts'], // 监听vite.config.js文件修改,无需重启
       }),
     ],
+    define: {
+      __UNI_PLATFORM__: JSON.stringify(UNI_PLATFORM),
+    },
     // 开发配置
     server: {
       host: '0.0.0.0',

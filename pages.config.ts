@@ -16,7 +16,7 @@ export default defineUniPages({
     autoscan: true,
     custom: {
       '^wd-(.*)': 'wot-design-uni/components/wd-$1/wd-$1.vue',
-      '^su-(.*)': '@/components/su-$1.vue' 
+      '^su-(.*)': '@/components/su-$1.vue'
     },
   },
   tabBar: {
@@ -34,7 +34,13 @@ export default defineUniPages({
         selectedIconPath: '/static/tabbar/home_active.png',
         pagePath: 'pages/index/index',
         text: '首页',
+      }, {
+        iconPath: '/static/tabbar/my_default.png',
+        selectedIconPath: '/static/tabbar/my_active.png',
+        pagePath: 'pages/shopFood/index',
+        text: '逛菜市场',
       },
+
       {
         iconPath: '/static/tabbar/my_default.png',
         selectedIconPath: '/static/tabbar/my_active.png',

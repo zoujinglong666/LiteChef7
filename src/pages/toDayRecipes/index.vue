@@ -1,22 +1,5 @@
 <template>
   <view class="recipe-page">
-<!--    &lt;!&ndash; 自定义导航栏 &ndash;&gt;-->
-<!--    <view class="navbar" :style="{ paddingTop: statusBarHeight + 'px' }">-->
-<!--      <view class="navbar-content">-->
-<!--        <view class="navbar-left">-->
-<!--          <view class="back-btn" @tap="handleBack">-->
-<!--            <text class="icon-back">‹</text>-->
-<!--          </view>-->
-<!--        </view>-->
-<!--        <view class="navbar-title">今日菜谱</view>-->
-<!--        <view class="navbar-right">-->
-<!--          <view class="more-btn" @tap="handleMore">-->
-<!--            <text class="icon-more">⋯</text>-->
-<!--          </view>-->
-<!--        </view>-->
-<!--      </view>-->
-<!--    </view>-->
-
     <!-- 主要内容 -->
     <scroll-view class="main-content" scroll-y>
       <!-- 日期信息 -->
@@ -111,9 +94,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { getTodayRecipes, getRandomRecipes, type Recipe } from '../../utils/recipes'
-import { getDayOfWeek, getFormattedDate } from '../../utils/dateUtils'
+import { getTodayRecipes, getRandomRecipes, type Recipe } from '@/utils/recipes'
+import { getDayOfWeek, getFormattedDate } from '@/utils/dateUtils'
 
 const recipes = ref<Recipe[]>([])
 const isLoading = ref(false)
@@ -180,67 +162,6 @@ onMounted(() => {
   background: linear-gradient(135deg, #fef7f0 0%, #fdf2f8 100%);
 }
 
-/* 导航栏样式 */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.navbar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 44px;
-  padding: 0 16px;
-}
-
-.navbar-left,
-.navbar-right {
-  width: 40px;
-  display: flex;
-  justify-content: center;
-}
-
-.back-btn,
-.more-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
-  background: #f8fafc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.back-btn:active,
-.more-btn:active {
-  background: #e2e8f0;
-  transform: scale(0.95);
-}
-
-.icon-back {
-  font-size: 24px;
-  font-weight: bold;
-  color: #475569;
-}
-
-.icon-more {
-  font-size: 20px;
-  color: #475569;
-}
-
-.navbar-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1e293b;
-}
 
 /* 主要内容 */
 /*padding-top: 88px; /* 状态栏 + 导航栏高度 */

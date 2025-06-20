@@ -144,7 +144,9 @@ onLoad(() => {
   // 监听事件（只绑定一次）
   eventBus.on('refreshNodeList', refreshHandler)
 })
-
+onShow(() => {
+  updateNodeList() // 页面切回来时刷新
+})
 onUnmounted(() => {
   // 避免重复监听或内存泄漏
   eventBus.off('refreshNodeList', refreshHandler)

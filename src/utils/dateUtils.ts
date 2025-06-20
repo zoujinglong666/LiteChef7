@@ -10,3 +10,9 @@ export const getFormattedDate = (): string => {
   const date = today.getDate();
   return `${month}月${date}日`;
 };
+export function getFormattedDateOffset(offset: number): string {
+  const date = new Date()
+  date.setDate(date.getDate() + offset)
+  return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
+}
+
