@@ -17,7 +17,10 @@
           <text class="icon">📅</text>
           <text class="text">每周菜谱</text>
         </view>
-
+        <view class="menu-item" @click="goTo('/pages/toDayRecipes/index')">
+          <text class="icon">📅</text>
+          <text class="text">今日菜谱</text>
+        </view>
         <view class="menu-item" @click="goTo('/pages/myRecipes/index')">
           <text class="icon">📖</text>
           <text class="text">我的菜谱</text>
@@ -27,6 +30,8 @@
           <text class="icon">ℹ️</text>
           <text class="text">关于项目</text>
         </view>
+
+
       </view>
     </view>
   </template>

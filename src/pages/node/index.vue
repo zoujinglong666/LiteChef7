@@ -49,6 +49,8 @@
   </wd-form>
 </template>
 <script setup lang="ts">
+import eventBus from "@/utils/eventBus";
+
 const model = reactive<{
   name: string
   score: string
@@ -99,6 +101,7 @@ function handleSubmit() {
           model.recommendation = ''
           model.remark = ''
           uni.navigateBack()
+          eventBus.emit('refreshNodeList')
         })
 
       }

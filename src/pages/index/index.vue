@@ -8,7 +8,7 @@
 </route>
 
 <template>
-  <wd-tabs v-model="tab" swipeable>
+  <wd-tabs v-model="tab" auto-line-width>
     <wd-tab title="吃个啥" name="recipes">
       <view style="padding: 10px;">
         <wd-swiper :list="swiperList" autoplay v-model:current="current" @click="handleClick"
@@ -34,7 +34,7 @@
               <text class="title">{{ item.name }}</text>
               <text class="score">{{ item.score }} 分</text>
             </view>
-<!--            <view class="desc">推荐平台：{{ item.recommendation }}</view>-->
+            <!--            <view class="desc">推荐平台：{{ item.recommendation }}</view>-->
             <view class="desc">{{ item.remark }}</view>
             <view class="timestamp">{{ item.createTime }}</view>
           </view>
@@ -55,20 +55,22 @@
 
 <script setup lang="ts">
 import allRecipesData from '@/mockData/all_recipes.json'
+import eventBus from "@/utils/eventBus";
 
 const tab = ref<number>(0)
 const current = ref<number>(0)
 const recommendCards = [
-  { icon: '📅', title: '每周菜谱', action: 'week' },
-  { icon: '🍛', title: '下饭菜', action: 'rice' }
+  {icon: '📅', title: '每周菜谱', action: 'week'},
+  {icon: '🍛', title: '下饭菜', action: 'rice'}
 ]
 const swiperList = ref([])
 const nodeList = ref([])
+
 function handleRecommendCardClick(action: string) {
   if (action === 'week') {
-    uni.navigateTo({ url: '/pages/weekRecipes/index' })
+    uni.navigateTo({url: '/pages/weekRecipes/index'})
   } else if (action === 'rice') {
-    uni.navigateTo({ url: '/pages/riceDishes/index' })
+    uni.navigateTo({url: '/pages/riceDishes/index'})
   }
   // 其他类型扩展...
 }
@@ -80,21 +82,17 @@ const gradients = [
   'linear-gradient(135deg, #f4f9ff 0%, #fefefe 100%)', // 淡蓝白
   'linear-gradient(135deg, #fcf9f4 0%, #f3f8f2 100%)'  // 浅黄米
 ]
+
 function getGradient(index: number) {
   return gradients[index % gradients.length]
 }
-
 
 
 function handleAction(action: string) {
   console.log(action)
 }
 
-onLoad(() => {
-  nodeList.value = uni.getStorageSync('food_records') || []
-  console.log(nodeList.value,'nodeList')
-  swiperList.value = getDailyRecipes(allRecipesData, 5).map(item => item['cover_image'])
-})
+
 
 function getDailyRecipes(allData, count = 5) {
   const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, ''); // 如：20250619
@@ -123,11 +121,34 @@ function onChange(e) {
 }
 
 
-
 function handleAddNode() {
   uni.navigateTo({url: '/pages/node/index'});
 }
 
+function updateNodeList() {
+  nodeList.value = uni.getStorageSync('food_records') || []
+}
+
+function updateSwiperList() {
+  swiperList.value = getDailyRecipes(allRecipesData, 5).map(item => item['cover_image'])
+}
+
+// 🎯 保证事件只监听一次
+const refreshHandler = () => updateNodeList()
+
+onLoad(() => {
+  // 初始化数据
+  updateNodeList()
+  updateSwiperList()
+
+  // 监听事件（只绑定一次）
+  eventBus.on('refreshNodeList', refreshHandler)
+})
+
+onUnmounted(() => {
+  // 避免重复监听或内存泄漏
+  eventBus.off('refreshNodeList', refreshHandler)
+})
 </script>
 
 <style>
@@ -205,6 +226,7 @@ function handleAddNode() {
 .action {
   height: 100%;
 }
+
 .button {
   display: inline-block;
   min-height: 60px;
