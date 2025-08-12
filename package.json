@@ -87,7 +87,7 @@
     "pinia": "^2.2.4",
     "pinia-plugin-unistorage": "^0.1.2",
     "vue": "3.4.21",
-    "wot-design-uni": "^1.5.1"
+    "wot-design-uni": "^1.9.1"
   },
   "devDependencies": {
     "@dcloudio/types": "^3.4.14",

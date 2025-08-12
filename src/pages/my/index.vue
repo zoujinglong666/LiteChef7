@@ -1,63 +1,57 @@
 <route lang="json">
 {
-  "layout": "tabbar",
-  "style": { "navigationBarTitleText": "我的" },
-  "name": "my"
+"layout": "tabbar",
+"style": { "navigationBarTitleText": "我的" },
+"name": "my"
 }
 </route>
-  <template>
-    <view class="mine-page">
-      <view class="user-card">
-        <image src="/static/logo.png" class="avatar" mode="aspectFit" />
-        <view class="nickname">Hi，我的美食记录</view>
-      </view>
-        <view class="menu-section">
-          <view
-            class="menu-item"
-            v-for="(item, index) in menuList"
-            :key="index"
-            @click="goTo(item.path)"
-          >
-            <text class="icon">{{ item.icon }}</text>
-            <text class="text">{{ item.text }}</text>
-          </view>
-        </view>
+<template>
+  <view class="mine-page">
+    <view class="user-card">
+      <image src="/static/logo.png" class="avatar" mode="aspectFit"/>
+      <view class="nickname">Hi，我的美食记录</view>
     </view>
-  </template>
-
+    <view class="menu-section">
+      <view
+        class="menu-item"
+        v-for="(item, index) in menuList"
+        :key="index"
+        @click="goTo(item.path)"
+      >
+        <view :class="item.icon" style="margin-right: 10px"/>
+        <text class="text">{{ item.text }}</text>
+      </view>
+    </view>
+  </view>
+</template>
 
 <script setup lang="ts">
 const menuList = [
   {
-    icon: '📅',
-    text: '每周菜谱',
-    path: '/pages/weekRecipes/index',
-  },
-  {
-    icon: '📅',
-    text: '每周菜谱1',
-    path: '/pages/weekDay/weekDay',
-  },
-  {
-    icon: '📅',
-    text: '今日菜谱',
-    path: '/pages/toDayRecipes/index',
-  },
-  {
-    icon: '📖',
-    text: '我的菜谱',
+    icon: 'sn-icon-park-outline:like', // ❤️ 更贴合“收藏”
+    text: '我的收藏',
     path: '/pages/myRecipes/index',
   },
   {
-    icon: 'ℹ️',
+    icon: 'sn-icon-park-outline:chef-hat', // 👨‍🍳 厨房小能手（烹饪工具）
+    text: '烹饪计时器',
+    path: '/pages/kitchenTools/timer',
+  },
+  {
+    icon: 'sn-icon-park-outline:scale', // ⚖️ 比例工具
+    text: '油盐糖比例表',
+    path: '/pages/kitchenTools/ratio',
+  },
+  {
+    icon: 'sn-icon-park-outline:info', // ℹ️ 常用表示“关于”信息
     text: '关于项目',
     path: '/pages/about/index',
   },
+];
 
-]
 
 function goTo(url: string) {
-  uni.navigateTo({ url })
+  uni.navigateTo({url})
 }
 </script>
 <style scoped lang="scss">

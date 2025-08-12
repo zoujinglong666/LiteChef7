@@ -1,4 +1,4 @@
-const { VITE_OPNE_NO_LOGIN } = import.meta.env;
+const {VITE_OPNE_NO_LOGIN} = import.meta.env;
 /**
  * !!! 注： whiteListByPath 和 loginList不能同时生效
  * VITE_OPNE_NO_LOGIN 为true 设置whiteListByPath，反之设置loginList

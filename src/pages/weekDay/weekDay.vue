@@ -32,7 +32,7 @@
                   class="recipe-image"
                 />
                 <view class="time-badge">
-                  <text class="time-icon">🕐</text>
+                  <view class="sn-icon-park-outline:stopwatch-start time-icon" />
                   <text class="time-text">{{ recipe.cookTime }}</text>
                 </view>
                 <view class="image-overlay"></view>
@@ -167,6 +167,8 @@ const handleRecipeClick = (id: string) => {
   overflow: hidden;
   margin-bottom: 8px;
   transition: all 0.3s;
+  display: flex;
+  align-content: center;
 }
 
 .recipe-card:active {
@@ -201,6 +203,7 @@ const handleRecipeClick = (id: string) => {
 .time-icon {
   font-size: 14px;
   margin-right: 4px;
+  color: white;
 }
 
 .time-text {

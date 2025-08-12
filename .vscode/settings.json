@@ -1,9 +1,14 @@
 {
-  // 默认格式化工具选择prettier
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   // 保存的时候自动格式化
   "editor.formatOnSave": true,
-  //开启自动修复
+  "files.eol": "\n",
+  "files.autoGuessEncoding": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+//开启自动修复
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.fixAll.eslint": "explicit",

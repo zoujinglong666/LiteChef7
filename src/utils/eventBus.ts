@@ -37,9 +37,9 @@ class EventBus {
   emit(event: string, ...args: any[]) {
     const handlers = this.events.get(event)
     if (handlers) {
-      for (const handler of [...handlers]) {
+      handlers.forEach(handler => {
         handler(...args)
-      }
+      })
     }
   }
 

@@ -68,6 +68,7 @@ watch(() => props.cols, initColumns)
 /** 把 item 分配到当前最矮的那列 */
 function distribute(items: any[]) {
   items.forEach(item => {
+    console.log(item)
     const minIndex = heights.value.indexOf(Math.min(...heights.value))
     columns.value[minIndex].push(item)
     heights.value[minIndex] += item._height || 0

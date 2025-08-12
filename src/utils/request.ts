@@ -1,4 +1,4 @@
-import axios, {AxiosRequestConfig, AxiosResponse, AxiosInstance} from 'axios';
+import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {createUniAppAxiosAdapter} from '@uni-helper/axios-adapter';
 import {useUserStore} from '@/store';
 
