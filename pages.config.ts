@@ -38,7 +38,7 @@ export default defineUniPages({
         iconPath: '/static/tabbar/my_default.png',
         selectedIconPath: '/static/tabbar/my_active.png',
         pagePath: 'pages/shopFood/index',
-        text: '逛菜市场',
+        text: '逛菜',
       },
 
       {
