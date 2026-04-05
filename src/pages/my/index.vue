@@ -78,9 +78,7 @@
     <view class="section">
       <view class="section-head"><text class="section-title">🛠️ 厨房工具</text></view>
       <view class="tool-grid">
-        <view class="tool-item" @click="go('/pages/kitchenTools/timer')"><text class="tool-icon">⏱️</text><text class="tool-name">计时器</text></view>
-        <view class="tool-item" @click="go('/pages/kitchenTools/ratio')"><text class="tool-icon">⚖️</text><text class="tool-name">油盐糖比例</text></view>
-        <view class="tool-item" @click="go('/pages/kitchenTools/replace')"><text class="tool-icon">🔄</text><text class="tool-name">调料替换</text></view>
+        <view class="tool-item" @click="go('/pages/kitchenTools/index')"><text class="tool-icon">🧰</text><text class="tool-name">工具箱</text></view>
         <view class="tool-item" @click="showAbout"><text class="tool-icon">ℹ️</text><text class="tool-name">关于</text></view>
       </view>
     </view>

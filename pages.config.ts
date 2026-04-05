@@ -32,10 +32,14 @@ export default defineUniPages({
       {
         pagePath: 'pages/moodRecipe/index',
         text: '心情',
+        iconPath: 'static/tabbar/home_default.png',
+        selectedIconPath: 'static/tabbar/home_active.png',
       },
       {
         pagePath: 'pages/my/index',
         text: '我的',
+        iconPath: 'static/tabbar/my_default.png',
+        selectedIconPath: 'static/tabbar/my_active.png',
       },
     ],
   },

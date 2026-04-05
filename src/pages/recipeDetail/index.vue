@@ -14,10 +14,10 @@
       <!-- 返回按钮 -->
       <view class="nav-bar">
         <view class="back-btn" @click="goBack">
-          <text class="back-icon">‹</text>
+          <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
         <view class="nav-actions">
-          <text class="fav-icon" @click="toggleFav">{{ isFaved ? '❤️' : '🤍' }}</text>
+          <text class="fav-icon" @click="toggleFav">{{ isFaved ? '<text class="sn-i-[icon-park-outline-like]" style="color:#FF6B35"></text>' : '<text class="sn-i-[icon-park-outline-like]"></text>' }}</text>
         </view>
       </view>
       <!-- 菜谱主图 -->
@@ -107,10 +107,10 @@
       <!-- 底部操作 -->
       <view class="bottom-actions">
         <button class="btn-fav" :class="{ faved: isFaved }" @click="toggleFav">
-          {{ isFaved ? '❤️ 已收藏' : '🤍 收藏菜谱' }}
+          {{ isFaved ? '<text class="sn-i-[icon-park-outline-like]" style="color:#FF6B35"></text> 已收藏' : '<text class="sn-i-[icon-park-outline-like]"></text> 收藏菜谱' }}
         </button>
         <button class="btn-share" @click="shareRecipe">
-          📤 分享
+          <text class="sn-i-[icon-park-outline-share]"></text> 分享
         </button>
       </view>
 
@@ -157,7 +157,7 @@ function toggleFav() {
       mood: recipe.value.mood
     })
     isFaved.value = true
-    uni.showToast({ title: '已收藏 ❤️', icon: 'none' })
+    uni.showToast({ title: '已收藏 <text class="sn-i-[icon-park-outline-like]" style="color:#FF6B35"></text>', icon: 'none' })
   }
 }
 
