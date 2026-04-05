@@ -69,10 +69,10 @@
           :key="recipe.url"
           @click="viewRecipeDetail(recipe)"
         >
-          <image :src="recipe.cover_image" mode="aspectFill" class="recipe-image"/>
+          <view class="recipe-emoji"><text class="emoji-icon">{{ recipe.image }}</text></view>
           <view class="recipe-content">
             <text class="recipe-name">{{recipe.name}}</text>
-            <text class="recipe-ingredients">{{recipe.ingredients}}</text>
+            <text class="recipe-ingredients">{{recipe.ingredients.join("、")}}</text>
             <view class="recipe-meta">
               <text class="match-type">{{ getMatchType(recipe) }}</text>
             </view>
@@ -148,8 +148,7 @@
 </template>
 
 <script setup lang="ts">
-import allRecipesData from '@/mockData/all_recipes.json'
-import xfcRecipesData from '@/mockData/xfc_recipes.json'
+import { searchRecipes } from '@/utils/recipes'
 
 // 响应式数据
 const searchKeyword = ref('')
@@ -158,8 +157,6 @@ const activeFilter = ref('all')
 const recentSearches = ref<string[]>([])
 
 // 合并所有食谱数据
-const allRecipes = [...allRecipesData, ...xfcRecipesData]
-
 // 热门搜索关键词
 const hotKeywords = ['红烧肉', '宫保鸡丁', '麻婆豆腐', '糖醋排骨', '鱼香肉丝', '西红柿鸡蛋', '青椒肉丝', '回锅肉']
 
@@ -167,34 +164,22 @@ const hotKeywords = ['红烧肉', '宫保鸡丁', '麻婆豆腐', '糖醋排骨'
 const recommendedKeywords = ['家常菜', '川菜', '素食', '汤类', '快手菜', '下饭菜']
 
 // 搜索结果
-const allResults = computed(() => {
+const allResults = computed((): any[] => {
   if (!searchKeyword.value.trim()) return []
-
-  const keyword = searchKeyword.value.toLowerCase().trim()
-  return allRecipes.filter(recipe =>
-    recipe.name.toLowerCase().includes(keyword) ||
-    recipe.ingredients.toLowerCase().includes(keyword)
-  )
+  return searchRecipes(searchKeyword.value.trim())
 })
 
 // 按菜名搜索的结果
-const nameResults = computed(() => {
+const nameResults = computed((): any[] => {
   if (!searchKeyword.value.trim()) return []
-
-  const keyword = searchKeyword.value.toLowerCase().trim()
-  return allRecipes.filter(recipe =>
-    recipe.name.toLowerCase().includes(keyword)
-  )
+  return allResults.value.filter((r: any) => r.name.includes(searchKeyword.value.trim()))
 })
 
 // 按食材搜索的结果
-const ingredientResults = computed(() => {
+const ingredientResults = computed((): any[] => {
   if (!searchKeyword.value.trim()) return []
-
-  const keyword = searchKeyword.value.toLowerCase().trim()
-  return allRecipes.filter(recipe =>
-    recipe.ingredients.toLowerCase().includes(keyword) &&
-    !recipe.name.toLowerCase().includes(keyword)
+  return allResults.value.filter((r: any) =>
+    r.ingredients.some((i: string) => i.includes(searchKeyword.value.trim()))
   )
 })
 
@@ -290,7 +275,7 @@ function getHighlightedName(name: string): any[] {
 const getMatchType = (recipe: any) => {
   const keyword = searchKeyword.value.toLowerCase().trim()
   const nameMatch = recipe.name.toLowerCase().includes(keyword)
-  const ingredientMatch = recipe.ingredients.toLowerCase().includes(keyword)
+  const ingredientMatch = recipe.ingredients.join("、").toLowerCase().includes(keyword)
 
   if (nameMatch && ingredientMatch) return '菜名+食材'
   if (nameMatch) return '菜名匹配'
@@ -371,10 +356,13 @@ const clearRecentSearches = () => {
   })
 }
 
-// 查看食谱详情
+// 查看食谱详情（弹窗展示）
 const viewRecipeDetail = (recipe: any) => {
-  uni.navigateTo({
-    url: `/pages/recipeDetail/index?url=${encodeURIComponent(recipe.url)}`
+  uni.showModal({
+    title: recipe.name,
+    content: `🥘 ${recipe.description}\n\n📝 食材：${recipe.ingredients.join('、')}\n\n⏱️ 时间：${recipe.cookTime}\n\n📖 步骤：\n${recipe.steps.map((s, i) => `${i+1}. ${s}`).join('\n')}`,
+    confirmText: '知道了',
+    showCancel: false
   })
 }
 
@@ -512,6 +500,21 @@ onMounted(() => {
   background-color: #f0f0f0;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.recipe-emoji {
+  width: 113px;
+  height: 85px;
+  border-radius: 4px;
+  background: #FFF5E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.emoji-icon {
+  font-size: 50px;
 }
 
 .recipe-content {

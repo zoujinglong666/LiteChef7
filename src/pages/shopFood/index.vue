@@ -12,14 +12,14 @@
     <CWaterfall
       :request="fetchLocalPage"
       :item-key="'id'"
-      :imageField="'cover_image'"
+      :imageField="'image'"
       :cols="2"
       :gap="12"
     >
       <template #item="{ item }">
         <view class="waterfall-card" @click="handleClickCard(item)">
           <view class="image-wrapper">
-            <image :src="item['cover_image']" mode="widthFix" class="cover-image"/>
+            <image :src="item.image" mode="widthFix" class="cover-image"/>
             <view class="overlay-gradient"></view>
 <!--            <view class="like-badge" v-if="item.likes">-->
 <!--              <text class="iconfont icon-heart"></text>-->
@@ -30,7 +30,7 @@
             <view class="title">{{ item.name }}</view>
             <view class="recipe-tags">
               <text
-                v-for="(tag, i) in item.ingredients.split('、').slice(0, 3)"
+                v-for="(tag, i) in (item.ingredients||[]).join('、').split('、').slice(0, 3)"
                 :key="i"
                 class="recipe-tag"
               >{{ tag }}
@@ -45,8 +45,8 @@
 
 <script setup lang="ts">
 import CWaterfall from '@/components/CWaterfall/index.vue';
-import allRecipesData from '@/mockData/all_recipes.json';
-import xfcRecipesData from '@/mockData/xfc_recipes.json';
+import { getRandomRecipes } from '@/utils/recipes';
+;
 
 function fetchLocalPage(page: number, pageSize: number): Promise<any[]> {
   return new Promise(resolve => {
@@ -65,12 +65,12 @@ function fetchLocalPage(page: number, pageSize: number): Promise<any[]> {
 
 function handleClickCard(item) {
   uni.navigateTo({
-    url: `/pages/recipeDetail/index?url=${encodeURIComponent(item.url)}`
+    url: `/pages/recipeDetail/index?url=${encodeURIComponent('')}`
   })
 }
 
 function getPagedData(page: number, pageSize: number) {
-  const totalData = [...allRecipesData, ...xfcRecipesData]
+  const totalData = getRandomRecipes(20)
   const total = totalData.length
   const start = (page - 1) * pageSize
   const end = start + pageSize

@@ -55,7 +55,7 @@
           <view class="seasonal-list">
             <view class="seasonal-item" v-for="item in seasonalRecipes" :key="item.name"
                   @click="viewRecipeDetail(item)">
-              <image :src="item.cover_image" mode="aspectFill" class="seasonal-image"/>
+              <image :src="item.image" mode="aspectFill" class="seasonal-image"/>
               <view class="seasonal-info">
                 <text class="seasonal-name">{{ item.name }}</text>
                 <text class="seasonal-tag">{{ getSeasonTag() }}</text>
@@ -74,13 +74,13 @@
         <view class="recipe-cards">
           <view class="recipe-card" v-for="(item, index) in dailyRecipes" :key="item.name"
                 @click="viewRecipeDetail(item)">
-            <image :src="item.cover_image" mode="aspectFill" class="recipe-image"/>
+            <image :src="item.image" mode="aspectFill" class="recipe-image"/>
             <view class="recipe-info">
               <text class="recipe-name">{{ item.name }}</text>
               <view class="recipe-tags">
                 <text class="recipe-tag" v-for="(tag, idx) in getRandomTags(index)" :key="idx">{{ tag }}</text>
               </view>
-              <text class="recipe-ingredients">{{ item.ingredients }}</text>
+              <text class="recipe-ingredients">{{ (item.ingredients||[]).join('、') }}</text>
             </view>
           </view>
         </view>
@@ -120,8 +120,8 @@
 </template>
 
 <script setup lang="ts">
-import allRecipesData from '@/mockData/all_recipes.json'
 import eventBus from "@/utils/eventBus";
+import { getTodayRecipes } from "@/utils/recipes";
 
 // 搜索相关
 const searchValue = ref('')
@@ -151,6 +151,12 @@ const swiperList = ref([])
 
 // 功能导航
 const featureItems = [
+  {
+    icon: '😊',
+    title: '心情菜谱',
+    url: '/pages/moodRecipe/index',
+    bgColor: 'linear-gradient(135deg, #FFE4E1 0%, #FFDAB9 100%)'
+  },
   {
     icon: '📅',
     title: '每周菜谱',
@@ -246,7 +252,7 @@ function viewRecipeDetail(item: any) {
 // 轮播图点击
 function handleRecipeClick(e) {
   const index = e.current || current.value
-  const recipe = allRecipesData[index]
+  const recipe = getTodayRecipes(5)[index]
   if (recipe && recipe.url) {
     viewRecipeDetail(recipe)
   }
@@ -320,17 +326,17 @@ function updateNodeList() {
 }
 
 function updateSwiperList() {
-  swiperList.value = getDailyRecipes(allRecipesData, 5).map(item => item['cover_image'])
+  swiperList.value = getTodayRecipes(5).map(item => item.image)
 }
 
 function updateSeasonalRecipes() {
   // 从所有菜谱中随机选择8个作为应季推荐
-  seasonalRecipes.value = getDailyRecipes(allRecipesData, 8)
+  seasonalRecipes.value = getTodayRecipes(8)
 }
 
 function updateDailyRecipes() {
   // 从所有菜谱中随机选择6个作为今日食谱
-  dailyRecipes.value = getDailyRecipes(allRecipesData, 6)
+  dailyRecipes.value = getTodayRecipes(6)
 }
 
 // 🎯 保证事件只监听一次
@@ -415,7 +421,7 @@ onUnmounted(() => {
 }
 
 .feature-item {
-  width: 22%;
+  width: 18%;
   display: flex;
   flex-direction: column;
   align-items: center;

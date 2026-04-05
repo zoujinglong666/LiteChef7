@@ -83,7 +83,7 @@
         @click="handleClick(item)"
       >
         <view class="week-recipes-item-cover">
-          <image :src="item.cover_image" mode="aspectFill" class="cover-image" />
+          <image :src="item.image" mode="aspectFill" class="cover-image" />
           <view class="weekday-badge">{{ item.weekday }}</view>
         </view>
         <view class="week-recipes-item-info">
@@ -92,7 +92,7 @@
           </view>
           <view class="ingredients-row">
             <text class="ingredients-icon">🍳</text>
-            <text class="ingredients-text">{{ item.ingredients }}</text>
+            <text class="ingredients-text">{{ (item.ingredients||[]).join('、') }}</text>
           </view>
         </view>
       </view>
@@ -126,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import allRecipesData from '@/mockData/all_recipes.json'
+import { getTodayRecipes } from '@/utils/recipes'
 
 const recommendList = ref([])
 const show = ref(false)
@@ -199,7 +199,7 @@ function filterRecipesByTags(recipes) {
 
   return recipes.filter(recipe => {
     const name = recipe.name.toLowerCase()
-    const ingredients = recipe.ingredients.toLowerCase()
+    const ingredients = (item.ingredients || []).join('、').toLowerCase()
 
     // 检查菜系
     const cuisineMatch = selectedCuisines.value.length === 0 || selectedCuisines.value.some(cuisine => {

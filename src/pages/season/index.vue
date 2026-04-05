@@ -193,7 +193,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import allRecipesData from '@/mockData/all_recipes.json';
+import { getRandomRecipes } from '@/utils/recipes';
 
 // 响应式数据
 const selectedImage = ref('');

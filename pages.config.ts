@@ -6,11 +6,11 @@ import { name } from './package.json';
  */
 export default defineUniPages({
   globalStyle: {
-    navigationStyle: 'default',
+    navigationStyle: 'custom',
     navigationBarTitleText: name,
-    navigationBarBackgroundColor: '#ffffff',
-    navigationBarTextStyle: 'black',
-    backgroundColor: '#FFFFFF',
+    navigationBarBackgroundColor: '#FF6B35',
+    navigationBarTextStyle: 'white',
+    backgroundColor: '#FFFAF6',
   },
   easycom: {
     autoscan: true,
@@ -20,30 +20,20 @@ export default defineUniPages({
     },
   },
   tabBar: {
-    color: '#999999',
-    selectedColor: '#5474f2',
-    backgroundColor: '#ffffff',
-    borderStyle: 'black',
-    height: '50px',
-    fontSize: '10px',
-    iconWidth: '24px',
-    spacing: '3px',
+    color: '#BBBBBB',
+    selectedColor: '#FF6B35',
+    backgroundColor: '#FFFFFF',
+    borderStyle: 'white',
+    height: '56px',
+    fontSize: '11px',
+    iconWidth: '26px',
+    spacing: '2px',
     list: [
       {
-        iconPath: '/static/tabbar/home_default.png',
-        selectedIconPath: '/static/tabbar/home_active.png',
-        pagePath: 'pages/index/index',
-        text: '首页',
-      }, {
-        iconPath: '/static/tabbar/my_default.png',
-        selectedIconPath: '/static/tabbar/my_active.png',
-        pagePath: 'pages/shopFood/index',
-        text: '逛菜',
+        pagePath: 'pages/moodRecipe/index',
+        text: '心情',
       },
-
       {
-        iconPath: '/static/tabbar/my_default.png',
-        selectedIconPath: '/static/tabbar/my_active.png',
         pagePath: 'pages/my/index',
         text: '我的',
       },

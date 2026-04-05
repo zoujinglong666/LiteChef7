@@ -103,8 +103,6 @@
 <script setup lang="ts">
 import { getTodayRecipes, getRandomRecipes, type Recipe } from '@/utils/recipes'
 import { getDayOfWeek, getFormattedDate } from '@/utils/dateUtils'
-// 导入mock数据
-import allRecipesData from '@/mockData/all_recipes.json'
 const recipes = ref<Recipe[]>([])
 const isLoading = ref(false)
 const statusBarHeight = ref(0)
