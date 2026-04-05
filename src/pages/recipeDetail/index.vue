@@ -17,7 +17,9 @@
           <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
         <view class="nav-actions">
-          <text class="fav-icon" @click="toggleFav">{{ isFaved ? '<text class="sn-i-[icon-park-outline-like]" style="color:#FF6B35"></text>' : '<text class="sn-i-[icon-park-outline-like]"></text>' }}</text>
+          <view class="fav-icon" @click="toggleFav">
+            <wd-icon :name="isFaved ? 'heart-filled' : 'heart'" size="24px" :color="isFaved ? '#FF6B35' : '#fff'" />
+          </view>
         </view>
       </view>
       <!-- 菜谱主图 -->

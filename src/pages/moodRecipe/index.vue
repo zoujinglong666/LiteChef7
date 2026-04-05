@@ -136,10 +136,10 @@ import { login, addMoodRecord, addFavorite, removeFavorite, getFavorites, type M
 
 // 菜式列表
 const cuisineList = [
-  { key: '中式' as CuisineType, icon: '中' },
-  { key: '日式' as CuisineType, icon: '日' },
-  { key: '西式' as CuisineType, icon: '西' },
-  { key: '韩式' as CuisineType, icon: '韩' },
+  { key: '中式' as CuisineType, icon: '🥢' },
+  { key: '日式' as CuisineType, icon: '🍣' },
+  { key: '西式' as CuisineType, icon: '🍝' },
+  { key: '韩式' as CuisineType, icon: '🌶️' },
 ]
 const selectedCuisine = ref<CuisineType>('中式')
 
