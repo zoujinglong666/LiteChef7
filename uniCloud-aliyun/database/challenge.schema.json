@@ -1,0 +1,36 @@
+{
+  "bsonType": "object",
+  "required": ["_id", "theme", "startDate", "endDate"],
+  "properties": {
+    "_id": { "description": "挑战赛ID" },
+    "theme": { "bsonType": "string", "description": "主题名称" },
+    "description": { "bsonType": "string", "description": "主题描述" },
+    "coverImage": { "bsonType": "string", "description": "封面图" },
+    "startDate": { "bsonType": "string", "description": "开始日期" },
+    "endDate": { "bsonType": "string", "description": "结束日期" },
+    "participants": {
+      "bsonType": "array",
+      "description": "参与者列表",
+      "items": {
+        "bsonType": "object",
+        "properties": {
+          "openid": { "bsonType": "string" },
+          "nickname": { "bsonType": "string" },
+          "avatar": { "bsonType": "string" },
+          "recipeId": { "bsonType": "string" },
+          "recipeName": { "bsonType": "string" },
+          "recipeImage": { "bsonType": "string" },
+          "likes": { "bsonType": "number" },
+          "joinTime": { "bsonType": "string" }
+        }
+      }
+    },
+    "winnerId": { "bsonType": "string", "description": "获胜者openid" },
+    "status": {
+      "bsonType": "string",
+      "description": "状态：ongoing/ended",
+      "enum": ["ongoing", "ended"]
+    },
+    "createTime": { "bsonType": "string" }
+  }
+}

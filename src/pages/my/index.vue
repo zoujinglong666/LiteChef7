@@ -78,6 +78,8 @@
     <view class="section">
       <view class="section-head"><text class="section-title">厨房工具</text></view>
       <view class="tool-grid">
+        <view class="tool-item" @click="go('/pages/chefCircle/index')"><wd-icon name="chat" size="20px" /><text class="tool-name">厨友圈</text></view>
+        <view class="tool-item" @click="go('/pages/weeklyChallenge/index')"><wd-icon name="star" size="20px" /><text class="tool-name">挑战赛</text></view>
         <view class="tool-item" @click="manualSync">
           <wd-icon :name="syncing ? 'refresh' : 'cloud'" size="20px" :class="{ 'syncing': syncing }" />
           <text class="tool-name">{{ syncing ? '同步中' : '云同步' }}</text>
