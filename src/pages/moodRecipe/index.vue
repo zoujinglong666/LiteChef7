@@ -89,7 +89,7 @@
               <view class="recipe-header">
                 <text class="recipe-name">{{ recipe.name }}</text>
                 <text class="fav-btn" @click.stop="toggleFav(recipe)">
-                  {{ isFav(recipe.name) ? '❤️' : '🤍' }}
+                  <wd-icon :name="isFav(recipe.name) ? 'heart-filled' : 'heart'" size="18px" :color="isFav(recipe.name) ? '#FF6B35' : '#999'" />
                 </text>
               </view>
               <text class="recipe-desc">{{ recipe.description }}</text>
@@ -98,7 +98,7 @@
                 <view class="recipe-tags">
                   <text class="tag" v-for="t in recipe.tags.slice(0,2)" :key="t">{{ t }}</text>
                 </view>
-                <text class="detail-link">查看步骤 ›</text>
+                <text class="detail-link">查看步骤</text>
               </view>
             </view>
           </view>
@@ -106,7 +106,7 @@
 
         <!-- 操作栏 -->
         <view class="action-bar">
-          <button class="btn-refresh" @click="refresh">🔄 换一批</button>
+          <button class="btn-refresh" @click="refresh">换一批</button>
           <button class="btn-save" @click="saveAll">💾 全部收藏</button>
         </view>
       </view>
@@ -136,10 +136,10 @@ import { login, addMoodRecord, addFavorite, removeFavorite, getFavorites, type M
 
 // 菜式列表
 const cuisineList = [
-  { key: '中式' as CuisineType, icon: '🥢' },
-  { key: '日式' as CuisineType, icon: '🍣' },
-  { key: '西式' as CuisineType, icon: '🍝' },
-  { key: '韩式' as CuisineType, icon: '🌶️' },
+  { key: '中式' as CuisineType, icon: '中' },
+  { key: '日式' as CuisineType, icon: '日' },
+  { key: '西式' as CuisineType, icon: '西' },
+  { key: '韩式' as CuisineType, icon: '韩' },
 ]
 const selectedCuisine = ref<CuisineType>('中式')
 
@@ -156,7 +156,7 @@ const moodList = [
 ]
 
 // 天气状态
-const weatherIcon = ref('🌤️')
+const weatherIcon = ref('?')
 const weatherText = ref('获取天气...')
 const weatherDesc = ref('')
 const temperature = ref<number | undefined>(undefined)
@@ -221,15 +221,15 @@ async function fetchWeather() {
 
       // 映射天气图标
       const code = parseInt(c.weatherCode)
-      if (code === 113) { weatherIcon.value = '☀️'; weatherText.value = `晴 ${temp}°` }
-      else if ([116,119,122].includes(code)) { weatherIcon.value = '⛅'; weatherText.value = `多云 ${temp}°` }
-      else if ([176,263,266,293,296,299,302,305,308,353,356,359].includes(code)) { weatherIcon.value = '🌧️'; weatherText.value = `下雨 ${temp}°` }
-      else if ([179,182,185,227,230,323,326,329,332,335,338,368,371,374,377].includes(code)) { weatherIcon.value = '❄️'; weatherText.value = `下雪 ${temp}°` }
-      else if ([200,386,389,392,395].includes(code)) { weatherIcon.value = '⛈️'; weatherText.value = `雷雨 ${temp}°` }
-      else { weatherIcon.value = '🌤️'; weatherText.value = `${temp}°C` }
+      if (code === 113) { weatherIcon.value = '晴'; weatherText.value = `晴 ${temp}°` }
+      else if ([116,119,122].includes(code)) { weatherIcon.value = '云'; weatherText.value = `多云 ${temp}°` }
+      else if ([176,263,266,293,296,299,302,305,308,353,356,359].includes(code)) { weatherIcon.value = '雨'; weatherText.value = `下雨 ${temp}°` }
+      else if ([179,182,185,227,230,323,326,329,332,335,338,368,371,374,377].includes(code)) { weatherIcon.value = '雪'; weatherText.value = `下雪 ${temp}°` }
+      else if ([200,386,389,392,395].includes(code)) { weatherIcon.value = '雷'; weatherText.value = `雷雨 ${temp}°` }
+      else { weatherIcon.value = '? '; weatherText.value = `${temp}°C` }
     }
   } catch {
-    weatherIcon.value = '🌤️'
+    weatherIcon.value = '? '
     weatherText.value = '点击获取天气'
   }
 }
@@ -311,7 +311,7 @@ async function toggleFav(recipe: any) {
         mood: recipe.mood
       })
       favorites.value.add(recipe.name)
-      uni.showToast({ title: '已收藏 ❤️', icon: 'none' })
+      uni.showToast({ title: '已收藏', icon: 'none' })
     }
     favorites.value = new Set(favorites.value)
   } catch {}

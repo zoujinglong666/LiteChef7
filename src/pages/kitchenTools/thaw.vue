@@ -16,7 +16,7 @@
         <view class="nav-right" />
       </view>
       <view class="header-info">
-        <text class="header-title">❄️ 科学解冻</text>
+        <text class="header-title">科学解冻</text>
         <text class="header-sub">计算最佳解冻时间，保证肉质鲜嫩</text>
       </view>
     </view>
@@ -44,7 +44,7 @@
     <!-- 重量输入 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">⚖️</text>
+        <wd-icon name="chart-pie" size="16px" class="section-icon" />
         <text class="section-title">输入重量</text>
       </view>
       <view class="weight-row">
@@ -92,7 +92,7 @@
     <!-- 计算结果 -->
     <view class="result-card" v-if="result">
       <view class="result-header">
-        <text class="result-icon">⏱️</text>
+        <wd-icon name="clock" size="18px" class="result-icon" />
         <text class="result-title">建议解冻时间</text>
       </view>
       <view class="result-time">
@@ -108,7 +108,7 @@
         </view>
       </view>
       <button class="start-btn" @click="startTimer">
-        ⏱️ 开始计时
+        开始计时
       </button>
     </view>
 
@@ -130,7 +130,7 @@ const meatList = [
 ]
 
 const methodList = [
-  { key: 'fridge', icon: '❄️', name: '冷藏室解冻', desc: '最安全，需提前规划' },
+  { key: 'fridge', icon: 'time', name: '冷藏室解冻', desc: '最安全，需提前规划' },
   { key: 'water', icon: '💧', name: '冷水浸泡', desc: '较快，需密封袋' },
   { key: 'room', icon: '🌡️', name: '室温解冻', desc: '最快，但需注意卫生' },
 ]

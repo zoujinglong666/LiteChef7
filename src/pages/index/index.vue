@@ -176,7 +176,7 @@ const featureItems = [
     bgColor: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)'
   },
   {
-    icon: '⏱️',
+    icon: 'clock',
     title: '快手菜',
     url: '/pages/quickRecipes/index',
     bgColor: 'linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%)'

@@ -360,7 +360,7 @@ const clearRecentSearches = () => {
 const viewRecipeDetail = (recipe: any) => {
   uni.showModal({
     title: recipe.name,
-    content: `🥘 ${recipe.description}\n\n📝 食材：${recipe.ingredients.join('、')}\n\n⏱️ 时间：${recipe.cookTime}\n\n📖 步骤：\n${recipe.steps.map((s, i) => `${i+1}. ${s}`).join('\n')}`,
+    content: `${recipe.description}\n\n食材：${recipe.ingredients.join('、')}\n\n时间：${recipe.cookTime}\n\n步骤：\n${recipe.steps.map((s, i) => `${i+1}. ${s}`).join('\n')}`,
     confirmText: '知道了',
     showCancel: false
   })

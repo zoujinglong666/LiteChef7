@@ -16,7 +16,7 @@
         <view class="nav-right" />
       </view>
       <view class="header-info">
-        <text class="header-title">🔄 缺食材？</text>
+        <text class="header-title">缺食材？</text>
         <text class="header-sub">AI 为你推荐最佳替代方案</text>
       </view>
     </view>
@@ -88,7 +88,7 @@
 
     <!-- 空状态 -->
     <view class="empty-hint" v-else>
-      <text class="hint-icon">💡</text>
+      <wd-icon name="info-circle" size="14px" class="hint-icon" />
       <text class="hint-text">输入缺少的食材，AI 会推荐最佳替代品</text>
     </view>
 

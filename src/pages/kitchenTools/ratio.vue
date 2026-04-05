@@ -16,7 +16,7 @@
         <view class="nav-right" />
       </view>
       <view class="header-info">
-        <text class="header-title">⚖️ 黄金比例</text>
+        <text class="header-title">黄金比例</text>
         <text class="header-sub">新手也能调出好味道</text>
       </view>
     </view>
@@ -49,7 +49,7 @@
           </view>
         </view>
         <view class="ratio-tip" v-if="item.tip">
-          <text class="tip-icon">💡</text>
+          <wd-icon name="info-circle" size="14px" class="tip-icon" />
           <text class="tip-text">{{ item.tip }}</text>
         </view>
       </view>
@@ -63,7 +63,7 @@
 const activeCategory = ref('sauce')
 
 const categories = [
-  { key: 'sauce', icon: '🥢', name: '酱汁' },
+  { key: 'sauce', icon: 'chart-pie', name: '酱汁' },
   { key: 'marinade', icon: '🥩', name: '腌制' },
   { key: 'soup', icon: '🍲', name: '汤底' },
   { key: 'dip', icon: '🥗', name: '蘸料' },

@@ -106,7 +106,7 @@
       <!-- 健康建议 -->
       <view class="health-advice">
         <view class="section-title">
-          <text class="title-icon">💡</text>
+          <wd-icon name="info-circle" size="14px" class="title-icon" />
           <text class="title-text">健康建议</text>
         </view>
 
@@ -153,7 +153,7 @@
                     >{{ tag }}</text
                   >
                 </view>
-                <text class="recipe-time">⏱️ {{ recipe.cookTime }}</text>
+                <text class="recipe-time">{{ recipe.cookTime }}</text>
               </view>
             </view>
           </view>

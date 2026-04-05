@@ -47,7 +47,7 @@
           <text class="meta-label">适合{{ recipe.mood }}时</text>
         </view>
         <view class="meta-item" v-if="recipe.weather">
-          <text class="meta-icon">🌤️</text>
+          <wd-icon name="cloud" size="14px" class="meta-icon" />
           <text class="meta-label">{{ recipe.weather }}天推荐</text>
         </view>
       </view>
@@ -89,7 +89,7 @@
       <!-- 小贴士 -->
       <view class="tips-box" v-if="recipe.tips">
         <view class="tips-header">
-          <text class="tips-icon">💡</text>
+          <wd-icon name="info-circle" size="14px" class="tips-icon" />
           <text class="tips-title">厨师小贴士</text>
         </view>
         <text class="tips-text">{{ recipe.tips }}</text>
@@ -98,7 +98,7 @@
       <!-- 适合场景 -->
       <view class="scene-box" v-if="recipe.suitableScene">
         <view class="scene-header">
-          <text class="scene-icon">✨</text>
+          <wd-icon name="star" size="14px" class="scene-icon" />
           <text class="scene-title">为什么适合你</text>
         </view>
         <text class="scene-text">{{ recipe.suitableScene }}</text>

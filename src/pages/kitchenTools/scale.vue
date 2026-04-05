@@ -16,7 +16,7 @@
         <view class="nav-right" />
       </view>
       <view class="header-info">
-        <text class="header-title">📐 智能换算</text>
+        <text class="header-title">智能换算</text>
         <text class="header-sub">自动计算不同人数的食材用量</text>
       </view>
     </view>
@@ -49,7 +49,7 @@
         </view>
       </view>
       <view class="scale-tip" v-if="scaleRatio !== 1">
-        <text class="tip-icon">💡</text>
+        <wd-icon name="info-circle" size="14px" class="tip-icon" />
         <text class="tip-text">所有食材将 ×{{ scaleRatio.toFixed(2) }}</text>
       </view>
     </view>

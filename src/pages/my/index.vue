@@ -52,7 +52,7 @@
             <text class="mood-name">{{ item.mood }}</text>
             <text class="mood-time">{{ item.time }}</text>
           </view>
-          <text class="mood-arrow">›</text>
+          <wd-icon name="chevron-right" size="16px" color="#CCC" />
         </view>
       </view>
     </view>
@@ -76,10 +76,10 @@
       </scroll-view>
     </view>
     <view class="section">
-      <view class="section-head"><text class="section-title">🛠️ 厨房工具</text></view>
+      <view class="section-head"><text class="section-title">厨房工具</text></view>
       <view class="tool-grid">
-        <view class="tool-item" @click="go('/pages/kitchenTools/index')"><text class="tool-icon">🧰</text><text class="tool-name">工具箱</text></view>
-        <view class="tool-item" @click="showAbout"><text class="tool-icon">ℹ️</text><text class="tool-name">关于</text></view>
+        <view class="tool-item" @click="go('/pages/kitchenTools/index')"><wd-icon name="setting" size="20px" /><text class="tool-name">工具箱</text></view>
+        <view class="tool-item" @click="showAbout"><wd-icon name="info-circle" size="20px" /><text class="tool-name">关于</text></view>
       </view>
     </view>
     <view style="height: 40rpx"/>
@@ -95,7 +95,7 @@ const moodHistory = ref<MoodRecord[]>([])
 const streak = ref(0)
 const moodCount = computed(() => moodHistory.value.length)
 const favCount = computed(() => favorites.value.length)
-const greeting = computed(() => { const h = new Date().getHours(); return h < 12 ? '早上好~☀️' : h < 18 ? '下午好~🌤️' : '晚上好~🌙' })
+const greeting = computed(() => { const h = new Date().getHours(); return h < 12 ? '早上好' : h < 18 ? '下午好' : '晚上好' })
 function refresh() { userInfo.value = getLocalUser(); favorites.value = getFavorites(); moodHistory.value = getMoodHistory(); streak.value = Math.min(moodHistory.value.length, 7) }
 function go(url: string) { uni.navigateTo({ url }) }
 function showHistoryDetail(item: MoodRecord) { uni.showModal({ title: `${item.moodIcon} ${item.mood}`, content: `${item.reason}\n\n${item.recipes.map((r,i) => `${i+1}. ${r.name}`).join('\n')}`, confirmText: '知道了', showCancel: false }) }

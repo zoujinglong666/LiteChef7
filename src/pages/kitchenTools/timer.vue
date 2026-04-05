@@ -30,13 +30,13 @@
       <button class="ctrl-btn primary" @click="toggleTimer">
         {{ isRunning ? '⏸ 暂停' : '▶ 继续' }}
       </button>
-      <button class="ctrl-btn" @click="resetTimer">🔄 重置</button>
+      <button class="ctrl-btn" @click="resetTimer">重置</button>
     </view>
 
     <!-- 快捷时间 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">⏱️</text>
+        <wd-icon name="clock" size="16px" class="section-icon" />
         <text class="section-title">快捷时间</text>
       </view>
       <view class="quick-grid">

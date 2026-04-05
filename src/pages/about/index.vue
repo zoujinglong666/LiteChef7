@@ -24,7 +24,7 @@
 
     <!-- 功能亮点 -->
     <view class="section">
-      <view class="section-title">✨ 功能亮点</view>
+      <view class="section-title">功能亮点</view>
       <view class="tag-list">
         <text class="tag">✅ 每日随机推荐</text>
         <text class="tag">✅ 每周精选食谱</text>
@@ -36,7 +36,7 @@
 
     <!-- 技术栈 -->
     <view class="section">
-      <view class="section-title">🛠️ 技术架构</view>
+      <view class="section-title">技术架构</view>
       <view class="section-content">
         - Vue 3 + Composition API + TypeScript<br/>
         - uni-app 跨端框架（H5 / 微信小程序）<br/>

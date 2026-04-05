@@ -16,7 +16,7 @@
         <view class="nav-right" />
       </view>
       <view class="header-info">
-        <text class="header-title">🔥 营养热量</text>
+        <text class="header-title">营养热量</text>
         <text class="header-sub">计算菜品总热量，健康饮食好帮手</text>
       </view>
     </view>
