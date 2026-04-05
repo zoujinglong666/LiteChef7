@@ -132,7 +132,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { getRecommendByMood, type CuisineType } from '@/apis/moodApi'
-import { login, addMoodRecord, addFavorite, removeFavorite, getFavorites, type MoodRecord } from '@/utils/auth'
+import { initUser, addMoodRecord, addFavorite, removeFavorite, getFavorites, type MoodRecord } from '@/utils/auth'
 
 // 菜式列表
 const cuisineList = [
@@ -195,7 +195,7 @@ function stopLoadingAnim() {
 }
 
 onMounted(async () => {
-  try { await login(); syncFavs() } catch {}
+  try { await initUser(); syncFavs() } catch {}
   fetchWeather()
 })
 
@@ -252,7 +252,7 @@ function selectMood(mood: typeof moodList[0]) {
 async function fetchRecommend(mood: typeof moodList[0]) {
   try {
     loadingText.value = `正在为你定制${selectedCuisine.value}菜谱...`
-    await login()
+    await initUser()
     const result = await getRecommendByMood(
       mood.name,
       mood.desc,
@@ -295,7 +295,7 @@ function goDetail(recipe: any) {
 
 async function toggleFav(recipe: any) {
   try {
-    await login()
+    await initUser()
     if (isFav(recipe.name)) {
       removeFavorite(recipe.name)
       favorites.value.delete(recipe.name)
@@ -320,7 +320,7 @@ async function toggleFav(recipe: any) {
 function saveAll() {
   if (!recommendResult.value || !currentMood.value) return
   try {
-    login()
+    initUser()
     const record: MoodRecord = {
       id: Date.now().toString(),
       mood: currentMood.value.name,

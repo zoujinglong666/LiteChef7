@@ -78,6 +78,10 @@
     <view class="section">
       <view class="section-head"><text class="section-title">厨房工具</text></view>
       <view class="tool-grid">
+        <view class="tool-item" @click="manualSync">
+          <wd-icon :name="syncing ? 'refresh' : 'cloud'" size="20px" :class="{ 'syncing': syncing }" />
+          <text class="tool-name">{{ syncing ? '同步中' : '云同步' }}</text>
+        </view>
         <view class="tool-item" @click="go('/pages/kitchenTools/index')"><wd-icon name="setting" size="20px" /><text class="tool-name">工具箱</text></view>
         <view class="tool-item" @click="showAbout"><wd-icon name="info-circle" size="20px" /><text class="tool-name">关于</text></view>
       </view>
@@ -88,22 +92,52 @@
 </template>
 
 <script setup lang="ts">
-import { getLocalUser, getFavorites, getMoodHistory, removeFavorite, type MoodRecord, type FavoriteRecipe } from '@/utils/auth'
+import { getLocalUser, getFavorites, getMoodHistory, removeFavorite, pullFromCloud, type MoodRecord, type FavoriteRecipe } from '@/utils/auth'
+
 const userInfo = ref(getLocalUser())
 const favorites = ref<FavoriteRecipe[]>([])
 const moodHistory = ref<MoodRecord[]>([])
 const streak = ref(0)
+const syncing = ref(false)
+const lastSyncTime = ref('')
+
 const moodCount = computed(() => moodHistory.value.length)
 const favCount = computed(() => favorites.value.length)
 const greeting = computed(() => { const h = new Date().getHours(); return h < 12 ? '早上好' : h < 18 ? '下午好' : '晚上好' })
-function refresh() { userInfo.value = getLocalUser(); favorites.value = getFavorites(); moodHistory.value = getMoodHistory(); streak.value = Math.min(moodHistory.value.length, 7) }
+
+function refresh() {
+  userInfo.value = getLocalUser()
+  favorites.value = getFavorites()
+  moodHistory.value = getMoodHistory()
+  streak.value = Math.min(moodHistory.value.length, 7)
+}
+
+async function manualSync() {
+  if (syncing.value) return
+  syncing.value = true
+  uni.showLoading({ title: '同步中...' })
+  
+  try {
+    await pullFromCloud()
+    refresh()
+    lastSyncTime.value = new Date().toLocaleTimeString('zh-CN')
+    uni.showToast({ title: '同步成功', icon: 'success' })
+  } catch (error) {
+    uni.showToast({ title: '同步失败', icon: 'none' })
+  } finally {
+    syncing.value = false
+    uni.hideLoading()
+  }
+}
+
 function go(url: string) { uni.navigateTo({ url }) }
 function showHistoryDetail(item: MoodRecord) { uni.showModal({ title: `${item.moodIcon} ${item.mood}`, content: `${item.reason}\n\n${item.recipes.map((r,i) => `${i+1}. ${r.name}`).join('\n')}`, confirmText: '知道了', showCancel: false }) }
 function showAllHistory() { uni.showToast({ title: `共${moodHistory.value.length}条`, icon: 'none' }) }
 function showAllFav() { uni.showToast({ title: `共${favorites.value.length}条`, icon: 'none' }) }
 function removeFav(name: string) { uni.showModal({ title: '取消收藏', content: `确定取消「${name}」？`, success: (res) => { if (res.confirm) { removeFavorite(name); refresh(); uni.showToast({ title: '已取消', icon: 'none' }) } } }) }
-function openVip() { uni.showModal({ title: '👑 心情会员', content: '会员专属：\n• 每日心情深度分析\n• 专属疗愈菜谱套餐\n• 历史健康报告\n• 无广告\n\n每月¥9.9，即将上线~', confirmText: '期待', showCancel: false }) }
-function showAbout() { uni.showModal({ title: '🍳 7天轻厨', content: '版本1.0.0\n基于AI心情分析的智能菜谱小程序\n© 2026 7天轻厨', confirmText: '知道了', showCancel: false }) }
+function openVip() { uni.showModal({ title: '👑 心情会员', content: '会员专属：\n• 每日心情深度分析\n• 专属疗愈菜谱套餐\n• 历史健康报告\n• 无广告\n• 云端数据同步\n\n每月¥9.9，即将上线~', confirmText: '期待', showCancel: false }) }
+function showAbout() { uni.showModal({ title: '🍳 7天轻厨 v3.0', content: '版本3.0.0\n新增：微信登录 + 云同步\n基于AI心情分析的智能菜谱小程序\n© 2026 7天轻厨', confirmText: '知道了', showCancel: false }) }
+
 onShow(() => { refresh() })
 </script>
 

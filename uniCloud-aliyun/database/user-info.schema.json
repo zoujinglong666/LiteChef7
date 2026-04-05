@@ -1,0 +1,78 @@
+{
+  "bsonType": "object",
+  "required": ["_id", "openid", "createTime"],
+  "properties": {
+    "_id": {
+      "description": "文档ID，使用openid作为_id"
+    },
+    "openid": {
+      "bsonType": "string",
+      "description": "微信用户唯一标识"
+    },
+    "nickname": {
+      "bsonType": "string",
+      "description": "用户昵称"
+    },
+    "avatar": {
+      "bsonType": "string",
+      "description": "头像URL"
+    },
+    "createTime": {
+      "bsonType": "string",
+      "description": "创建时间"
+    },
+    "updateTime": {
+      "bsonType": "string",
+      "description": "更新时间"
+    },
+    "moodHistory": {
+      "bsonType": "array",
+      "description": "心情历史记录",
+      "items": {
+        "bsonType": "object",
+        "properties": {
+          "id": { "bsonType": "string" },
+          "mood": { "bsonType": "string" },
+          "moodIcon": { "bsonType": "string" },
+          "reason": { "bsonType": "string" },
+          "recipes": { "bsonType": "array" },
+          "time": { "bsonType": "string" }
+        }
+      }
+    },
+    "favorites": {
+      "bsonType": "array",
+      "description": "收藏的菜谱",
+      "items": {
+        "bsonType": "object",
+        "properties": {
+          "name": { "bsonType": "string" },
+          "image": { "bsonType": "string" },
+          "ingredients": { "bsonType": "array" },
+          "time": { "bsonType": "string" },
+          "steps": { "bsonType": "array" },
+          "tips": { "bsonType": "string" },
+          "suitableScene": { "bsonType": "string" },
+          "mood": { "bsonType": "string" }
+        }
+      }
+    },
+    "settings": {
+      "bsonType": "object",
+      "description": "用户设置",
+      "properties": {
+        "defaultCuisine": { "bsonType": "string" },
+        "notifications": { "bsonType": "bool" }
+      }
+    },
+    "vipInfo": {
+      "bsonType": "object",
+      "description": "会员信息",
+      "properties": {
+        "isVip": { "bsonType": "bool" },
+        "expireTime": { "bsonType": "string" },
+        "plan": { "bsonType": "string" }
+      }
+    }
+  }
+}
