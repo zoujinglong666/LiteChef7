@@ -1,0 +1,8 @@
+{
+  "name": "recipe-interact",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@alicloud/mpserverless-sdk": "^2.0.0"
+  }
+}

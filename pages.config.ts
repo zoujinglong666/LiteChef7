@@ -36,6 +36,12 @@ export default defineUniPages({
         selectedIconPath: 'static/tabbar/home_active.png',
       },
       {
+        pagePath: 'pages/recipeSquare/index',
+        text: '广场',
+        iconPath: 'static/tabbar/square.png',
+        selectedIconPath: 'static/tabbar/square-active.png',
+      },
+      {
         pagePath: 'pages/my/index',
         text: '我的',
         iconPath: 'static/tabbar/my_default.png',
