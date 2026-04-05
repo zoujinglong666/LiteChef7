@@ -55,7 +55,7 @@
     <!-- 自定义时间 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">⚙️</text>
+        <wd-icon name="setting" size="16px" class="section-icon" />
         <text class="section-title">自定义时间</text>
       </view>
       <view class="custom-row">

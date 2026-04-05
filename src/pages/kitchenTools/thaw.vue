@@ -24,7 +24,7 @@
     <!-- 肉类选择 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">🥩</text>
+        <wd-icon name="goods" size="16px" class="section-icon" />
         <text class="section-title">选择肉类</text>
       </view>
       <view class="meat-grid">
@@ -69,7 +69,7 @@
     <!-- 解冻方式 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">🌡️</text>
+        <wd-icon name="setting" size="16px" class="section-icon" />
         <text class="section-title">解冻方式</text>
       </view>
       <view class="method-list">

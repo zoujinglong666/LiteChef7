@@ -24,7 +24,7 @@
     <!-- 人数设置 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">👥</text>
+        <wd-icon name="user" size="16px" class="section-icon" />
         <text class="section-title">设置人数</text>
       </view>
       <view class="people-row">
@@ -57,7 +57,7 @@
     <!-- 食材输入 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">🥗</text>
+        <wd-icon name="goods" size="16px" class="section-icon" />
         <text class="section-title">食材清单</text>
         <text class="section-add" @click="addIngredient">+ 添加</text>
       </view>
@@ -80,7 +80,7 @@
     <!-- 计算结果 -->
     <view class="section result-section" v-if="ingredients.length > 0">
       <view class="section-head">
-        <text class="section-icon">✅</text>
+        <wd-icon name="check-circle" size="16px" class="section-icon" />
         <text class="section-title">换算结果</text>
         <text class="section-copy" @click="copyResult">复制</text>
       </view>

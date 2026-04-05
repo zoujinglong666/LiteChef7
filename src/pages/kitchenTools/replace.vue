@@ -24,7 +24,7 @@
     <!-- 输入区 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">🔍</text>
+        <wd-icon name="search" size="16px" class="section-icon" />
         <text class="section-title">你缺少什么食材？</text>
       </view>
       <view class="input-row">

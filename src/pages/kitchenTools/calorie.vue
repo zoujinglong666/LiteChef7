@@ -24,7 +24,7 @@
     <!-- 食材列表 -->
     <view class="section">
       <view class="section-head">
-        <text class="section-icon">🥗</text>
+        <wd-icon name="goods" size="16px" class="section-icon" />
         <text class="section-title">添加食材</text>
         <text class="section-add" @click="showPicker = true">+ 选择</text>
       </view>

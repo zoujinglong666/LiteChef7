@@ -83,7 +83,7 @@
 
     <!-- 无结果状态 -->
     <view v-else-if="searchKeyword && !isLoading" class="no-results">
-      <view class="no-results-icon">🔍</view>
+      <wd-icon name="search" size="48px" color="#CCC" />
       <text class="no-results-title">未找到相关结果</text>
       <text class="no-results-subtitle">试试其他关键词或浏览推荐内容</text>
 

@@ -107,7 +107,7 @@
         <!-- 操作栏 -->
         <view class="action-bar">
           <button class="btn-refresh" @click="refresh">换一批</button>
-          <button class="btn-save" @click="saveAll">💾 全部收藏</button>
+          <button class="btn-save" @click="saveAll">全部收藏</button>
         </view>
       </view>
 
@@ -156,7 +156,7 @@ const moodList = [
 ]
 
 // 天气状态
-const weatherIcon = ref('?')
+const weatherIcon = ref('🌤️')
 const weatherText = ref('获取天气...')
 const weatherDesc = ref('')
 const temperature = ref<number | undefined>(undefined)
@@ -221,15 +221,15 @@ async function fetchWeather() {
 
       // 映射天气图标
       const code = parseInt(c.weatherCode)
-      if (code === 113) { weatherIcon.value = '晴'; weatherText.value = `晴 ${temp}°` }
-      else if ([116,119,122].includes(code)) { weatherIcon.value = '云'; weatherText.value = `多云 ${temp}°` }
-      else if ([176,263,266,293,296,299,302,305,308,353,356,359].includes(code)) { weatherIcon.value = '雨'; weatherText.value = `下雨 ${temp}°` }
-      else if ([179,182,185,227,230,323,326,329,332,335,338,368,371,374,377].includes(code)) { weatherIcon.value = '雪'; weatherText.value = `下雪 ${temp}°` }
-      else if ([200,386,389,392,395].includes(code)) { weatherIcon.value = '雷'; weatherText.value = `雷雨 ${temp}°` }
-      else { weatherIcon.value = '? '; weatherText.value = `${temp}°C` }
+      if (code === 113) { weatherIcon.value = '☀️'; weatherText.value = `晴 ${temp}°` }
+      else if ([116,119,122].includes(code)) { weatherIcon.value = '⛅'; weatherText.value = `多云 ${temp}°` }
+      else if ([176,263,266,293,296,299,302,305,308,353,356,359].includes(code)) { weatherIcon.value = '🌧️'; weatherText.value = `下雨 ${temp}°` }
+      else if ([179,182,185,227,230,323,326,329,332,335,338,368,371,374,377].includes(code)) { weatherIcon.value = '❄️'; weatherText.value = `下雪 ${temp}°` }
+      else if ([200,386,389,392,395].includes(code)) { weatherIcon.value = '⛈️'; weatherText.value = `雷雨 ${temp}°` }
+      else { weatherIcon.value = '🌤️'; weatherText.value = `${temp}°C` }
     }
   } catch {
-    weatherIcon.value = '? '
+    weatherIcon.value = '🌤️'
     weatherText.value = '点击获取天气'
   }
 }

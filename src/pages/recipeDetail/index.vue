@@ -109,10 +109,12 @@
       <!-- 底部操作 -->
       <view class="bottom-actions">
         <button class="btn-fav" :class="{ faved: isFaved }" @click="toggleFav">
-          {{ isFaved ? '<text class="sn-i-[icon-park-outline-like]" style="color:#FF6B35"></text> 已收藏' : '<text class="sn-i-[icon-park-outline-like]"></text> 收藏菜谱' }}
+          <wd-icon :name="isFaved ? 'heart-filled' : 'heart'" size="18px" :color="isFaved ? '#FF6B35' : '#666'" />
+          <text>{{ isFaved ? '已收藏' : '收藏' }}</text>
         </button>
         <button class="btn-share" @click="shareRecipe">
-          <text class="sn-i-[icon-park-outline-share]"></text> 分享
+          <wd-icon name="share" size="18px" />
+          <text>分享</text>
         </button>
       </view>
 

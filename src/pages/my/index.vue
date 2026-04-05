@@ -42,7 +42,7 @@
         <text class="section-more" v-if="moodHistory.length > 3" @click="showAllHistory">全部 ></text>
       </view>
       <view v-if="moodHistory.length === 0" class="empty">
-        <text class="empty-e">📝</text><text class="empty-t">还没有心情记录</text>
+        <wd-icon name="edit" size="40px" color="#CCC" /><text class="empty-t">还没有心情记录</text>
         <text class="empty-s">去「心情」选个心情开始吧~</text>
       </view>
       <view v-else class="mood-list">
@@ -62,7 +62,7 @@
         <text class="section-more" v-if="favorites.length > 4" @click="showAllFav">全部 ></text>
       </view>
       <view v-if="favorites.length === 0" class="empty">
-        <text class="empty-e">💾</text><text class="empty-t">还没有收藏</text>
+        <wd-icon name="folder" size="40px" color="#CCC" /><text class="empty-t">还没有收藏</text>
         <text class="empty-s">推荐的菜谱可以一键收藏~</text>
       </view>
       <scroll-view scroll-x v-else class="fav-scroll">
