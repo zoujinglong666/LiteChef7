@@ -16,7 +16,7 @@ export function initCloud() {
   }
   
   wx.cloud.init({
-    env: CLOUD_ENV || 'LiteChef7-xxxx', // 默认环境
+    env: CLOUD_ENV || 'cloud1-2grw3bbx061c1340', // 默认环境
     traceUser: true
   })
   
