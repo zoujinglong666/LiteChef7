@@ -173,7 +173,7 @@ onMounted(() => {
 
 async function loadFeatured() {
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'recipe-crud',
       data: { action: 'getFeatured' }
     }) as any
@@ -199,7 +199,7 @@ async function loadRecipes() {
       }
     }
     
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'recipe-crud',
       data: {
         action: 'getList',
@@ -235,7 +235,7 @@ async function handleSearch() {
   
   loading.value = true
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'recipe-crud',
       data: {
         action: 'search',

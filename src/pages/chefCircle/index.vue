@@ -129,7 +129,7 @@ async function loadFeed() {
   loading.value = true
   try {
     const user = getLocalUser()
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'chef-circle',
       data: {
         action: 'getFeed',
@@ -150,7 +150,7 @@ async function loadFeed() {
 async function loadDiscover() {
   loading.value = true
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'chef-circle',
       data: { action: 'getDiscover' }
     }) as any
@@ -178,7 +178,7 @@ async function createPost() {
   }
   
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'chef-circle',
       data: {
         action: 'createPost',
@@ -207,7 +207,7 @@ async function createPost() {
 
 async function likePost(postId: string) {
   try {
-    await uniCloud.callFunction({
+    await uni.cloud.callFunction({
       name: 'chef-circle',
       data: { action: 'likePost', postId }
     })

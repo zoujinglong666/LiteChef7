@@ -112,7 +112,7 @@ onMounted(() => {
 
 async function loadChallenge() {
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'weekly-challenge',
       data: { action: 'getCurrent' }
     }) as any
@@ -131,7 +131,7 @@ async function loadChallenge() {
 
 async function loadHistory() {
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'weekly-challenge',
       data: { action: 'getHistory' }
     }) as any
@@ -168,7 +168,7 @@ async function joinChallenge() {
 
 async function vote(participantId: string) {
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'weekly-challenge',
       data: {
         action: 'vote',

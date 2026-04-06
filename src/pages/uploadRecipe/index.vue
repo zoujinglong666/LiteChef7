@@ -196,7 +196,7 @@ async function handleSubmit() {
   try {
     const tags = tagsInput.value.split(/\s+/).filter(t => t.trim())
     
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'recipe-crud',
       data: {
         action: 'create',
