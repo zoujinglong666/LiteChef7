@@ -1,0 +1,20 @@
+{
+  "name": "LiteChef7",
+  "appid": "wx7dadae3892915697",
+  "description": "7天轻厨 - 心情菜谱小程序",
+  "versionName": "3.0.0",
+  "versionCode": "300",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "wx7dadae3892915697",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "enhance": true,
+      "postcss": true,
+      "minified": true
+    },
+    "usingComponents": true
+  },
+  "vueVersion": "3"
+}
