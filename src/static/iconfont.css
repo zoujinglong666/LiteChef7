@@ -1,0 +1,12 @@
+/* 本地图标字体 */
+@font-face {
+  font-family: 'wd-icon';
+  src: url('/static/fonts/wd-icons.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* 覆盖 wot-design-uni 的远程字体 */
+.wd-icon {
+  font-family: 'wd-icon' !important;
+}

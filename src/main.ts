@@ -2,6 +2,7 @@ import { createSSRApp } from 'vue';
 import App from './App.vue';
 import router, { routeInterceptor } from './router';
 import 'virtual:uno.css';
+import './static/iconfont.css';
 
 import * as Pinia from 'pinia';
 
