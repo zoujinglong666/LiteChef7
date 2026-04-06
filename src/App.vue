@@ -1,6 +1,21 @@
 <script setup lang="ts">
 import { initUser, pullFromCloud } from '@/utils/auth'
 
+// 初始化微信云开发
+function initCloud() {
+  if (typeof wx === 'undefined' || !wx.cloud) return
+  
+  try {
+    wx.cloud.init({
+      env: 'LiteChef7-xxxx', // TODO: 替换为实际云环境ID
+      traceUser: true
+    })
+    console.log('☁️ 微信云开发已初始化')
+  } catch (e) {
+    console.warn('云开发初始化跳过')
+  }
+}
+
 // 检查小程序版本更新
 function checkForUpdate() {
   if (typeof uni.getUpdateManager === 'undefined') {
@@ -45,6 +60,9 @@ function checkForUpdate() {
 
 onLaunch(async () => {
   console.log('App Launch')
+  
+  // 初始化云开发
+  initCloud()
   
   // 检查版本更新
   checkForUpdate()
