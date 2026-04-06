@@ -1,9 +1,9 @@
 /**
- * 微信静默登录 + 云同步
- * v3.0 升级版
+ * 微信云开发用户体系
+ * v3.0 微信云开发版
  */
 
-// 是否启用云同步（开发模式可关闭）
+// 是否启用云同步
 const ENABLE_CLOUD = true
 
 export interface UserInfo {
@@ -46,105 +46,134 @@ export interface FavoriteRecipe {
 }
 
 const USER_KEY = 'user_info'
-const CLOUD_SYNC_KEY = 'cloud_synced'
 
 /**
  * 初始化并登录
- * 优先从云端获取，失败则本地
  */
 export async function initUser(): Promise<UserInfo> {
   try {
-    // 1. 先尝试云登录
+    // 1. 初始化云开发
     if (ENABLE_CLOUD) {
-      const cloudUser = await cloudLogin()
-      if (cloudUser) {
-        console.log('☁️ 云登录成功:', cloudUser.openid)
-        saveLocalUser(cloudUser)
-        return cloudUser
-      }
+      initCloud()
     }
     
-    // 2. 云登录失败，使用本地
-    const localUser = getLocalUser()
-    if (localUser) {
-      console.log('📱 使用本地用户:', localUser.openid)
-      return localUser
+    // 2. 获取用户 openid
+    const openid = await getOpenId()
+    
+    // 3. 查询或创建用户
+    let user = await getUserFromCloud(openid)
+    
+    if (!user) {
+      // 本地创建
+      user = createLocalUser(openid)
+      saveLocalUser(user)
+    } else {
+      saveLocalUser(user)
     }
     
-    // 3. 都没有，创建新用户
-    const newUser = await createLocalUser()
-    console.log('🆕 创建新用户:', newUser.openid)
-    return newUser
+    console.log('✅ 用户初始化成功:', user.openid)
+    return user
     
   } catch (error) {
     console.error('❌ 初始化用户失败:', error)
-    // 降级到本地模式
-    return getLocalUser() || await createLocalUser()
+    return getLocalUser() || createLocalUser('local_' + Date.now())
   }
 }
 
 /**
- * 云端登录
+ * 获取 OpenId
  */
-async function cloudLogin(): Promise<UserInfo | null> {
-  return new Promise((resolve) => {
-    wx.login({
-      success: async (loginRes) => {
-        if (!loginRes.code) {
-          resolve(null)
-          return
-        }
-        
-        try {
-          // 调用云函数
-          const result = await uniCloud.callFunction({
-            name: 'user-login',
-            data: { code: loginRes.code }
-          }) as any
-          
-          if (result.result?.code === 200) {
-            resolve(result.result.data.userInfo)
-          } else {
-            console.error('云登录失败:', result.result)
-            resolve(null)
-          }
-        } catch (error) {
-          console.error('云函数调用失败:', error)
-          resolve(null)
+function getOpenId(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // 先检查本地缓存
+    const cached = uni.getStorageSync('openid')
+    if (cached) {
+      resolve(cached)
+      return
+    }
+    
+    // 调用云函数获取（云函数自动获取 openid）
+    uni.cloud.callFunction({
+      name: 'user-login',
+      data: { code: 'get-openid' },
+      success: (res: any) => {
+        if (res.result?.data?.openid) {
+          const openid = res.result.data.openid
+          uni.setStorageSync('openid', openid)
+          resolve(openid)
+        } else {
+          // 开发模式生成临时 id
+          const tempId = 'dev_' + Date.now()
+          resolve(tempId)
         }
       },
-      fail: () => resolve(null)
+      fail: () => {
+        // 降级方案
+        const tempId = 'dev_' + Date.now()
+        resolve(tempId)
+      }
     })
   })
 }
 
 /**
- * 创建本地用户（开发模式）
+ * 获取云端用户数据
  */
-async function createLocalUser(): Promise<UserInfo> {
-  return new Promise((resolve, reject) => {
-    wx.login({
-      success: (loginRes) => {
-        const openid = `dev_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
-        const user: UserInfo = {
-          openid,
-          createTime: new Date().toLocaleString('zh-CN'),
-          moodHistory: [],
-          favorites: [],
-          settings: {
-            defaultCuisine: '中式',
-            notifications: true
-          },
-          vipInfo: {
-            isVip: false
-          }
-        }
-        saveLocalUser(user)
-        resolve(user)
-      },
-      fail: reject
+async function getUserFromCloud(openid: string): Promise<UserInfo | null> {
+  if (!ENABLE_CLOUD) return null
+  
+  try {
+    const res = await uni.cloud.callFunction({
+      name: 'user-sync',
+      data: {
+        action: 'getUserData',
+        openid
+      }
+    }) as any
+    
+    if (res.result?.code === 200 && res.result.data) {
+      return res.result.data
+    }
+    return null
+  } catch (error) {
+    console.error('获取云端用户失败:', error)
+    return null
+  }
+}
+
+/**
+ * 初始化云开发
+ */
+function initCloud() {
+  if (typeof wx === 'undefined') return
+  
+  try {
+    wx.cloud?.init?.({
+      env: 'LiteChef7-xxxx', // TODO: 替换为实际环境ID
+      traceUser: true
     })
-  })
+  } catch (e) {
+    console.warn('云初始化跳过')
+  }
+}
+
+/**
+ * 创建本地用户
+ */
+function createLocalUser(openid: string): UserInfo {
+  return {
+    openid,
+    createTime: new Date().toLocaleString('zh-CN'),
+    moodHistory: [],
+    favorites: [],
+    settings: {
+      defaultCuisine: '中式',
+      notifications: true
+    },
+    vipInfo: {
+      isVip: false
+    }
+  }
 }
 
 /**
@@ -157,7 +186,7 @@ export async function syncToCloud(data: Partial<UserInfo>): Promise<boolean> {
   if (!user) return false
   
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'user-sync',
       data: {
         action: 'sync',
@@ -166,11 +195,7 @@ export async function syncToCloud(data: Partial<UserInfo>): Promise<boolean> {
       }
     }) as any
     
-    if (result.result?.code === 200) {
-      console.log('☁️ 同步成功')
-      return true
-    }
-    return false
+    return result.result?.code === 200
   } catch (error) {
     console.error('同步失败:', error)
     return false
@@ -187,7 +212,7 @@ export async function pullFromCloud(): Promise<UserInfo | null> {
   if (!user) return null
   
   try {
-    const result = await uniCloud.callFunction({
+    const result = await uni.cloud.callFunction({
       name: 'user-sync',
       data: {
         action: 'getUserData',
@@ -195,11 +220,10 @@ export async function pullFromCloud(): Promise<UserInfo | null> {
       }
     }) as any
     
-    if (result.result?.code === 200) {
-      const cloudUser = result.result.data
-      saveLocalUser(cloudUser)
+    if (result.result?.code === 200 && result.result.data) {
+      saveLocalUser(result.result.data)
       console.log('☁️ 拉取成功')
-      return cloudUser
+      return result.result.data
     }
     return null
   } catch (error) {
@@ -228,7 +252,7 @@ export function saveLocalUser(user: UserInfo): void {
 }
 
 /**
- * 更新用户信息（本地+云端）
+ * 更新用户信息
  */
 export async function updateUser(partial: Partial<UserInfo>): Promise<UserInfo> {
   const user = getLocalUser()
@@ -236,15 +260,13 @@ export async function updateUser(partial: Partial<UserInfo>): Promise<UserInfo> 
   
   const updated = { ...user, ...partial, updateTime: new Date().toISOString() }
   saveLocalUser(updated)
-  
-  // 异步同步到云端
   syncToCloud(partial).catch(() => {})
   
   return updated
 }
 
 /**
- * 添加收藏（本地+云端）
+ * 添加收藏
  */
 export async function addFavorite(recipe: FavoriteRecipe): Promise<void> {
   const user = getLocalUser()
@@ -257,25 +279,21 @@ export async function addFavorite(recipe: FavoriteRecipe): Promise<void> {
   user.favorites.unshift(newRecipe)
   saveLocalUser(user)
   
-  // 异步同步到云端
+  // 同步到云端
   if (ENABLE_CLOUD) {
-    try {
-      await uniCloud.callFunction({
-        name: 'user-sync',
-        data: {
-          action: 'addFavorite',
-          openid: user.openid,
-          data: newRecipe
-        }
-      })
-    } catch (error) {
-      console.error('收藏同步失败:', error)
-    }
+    uni.cloud.callFunction({
+      name: 'user-sync',
+      data: {
+        action: 'addFavorite',
+        openid: user.openid,
+        data: newRecipe
+      }
+    }).catch(console.error)
   }
 }
 
 /**
- * 移除收藏（本地+云端）
+ * 移除收藏
  */
 export async function removeFavorite(name: string): Promise<void> {
   const user = getLocalUser()
@@ -284,20 +302,16 @@ export async function removeFavorite(name: string): Promise<void> {
   user.favorites = user.favorites.filter(f => f.name !== name)
   saveLocalUser(user)
   
-  // 异步同步到云端
+  // 同步到云端
   if (ENABLE_CLOUD) {
-    try {
-      await uniCloud.callFunction({
-        name: 'user-sync',
-        data: {
-          action: 'removeFavorite',
-          openid: user.openid,
-          data: { name }
-        }
-      })
-    } catch (error) {
-      console.error('取消收藏同步失败:', error)
-    }
+    uni.cloud.callFunction({
+      name: 'user-sync',
+      data: {
+        action: 'removeFavorite',
+        openid: user.openid,
+        data: { name }
+      }
+    }).catch(console.error)
   }
 }
 
@@ -317,7 +331,7 @@ export function getFavorites(): FavoriteRecipe[] {
 }
 
 /**
- * 添加心情记录（本地+云端）
+ * 添加心情记录
  */
 export async function addMoodRecord(record: MoodRecord): Promise<void> {
   const user = getLocalUser()
@@ -327,20 +341,16 @@ export async function addMoodRecord(record: MoodRecord): Promise<void> {
   if (user.moodHistory.length > 50) user.moodHistory.pop()
   saveLocalUser(user)
   
-  // 异步同步到云端
+  // 同步到云端
   if (ENABLE_CLOUD) {
-    try {
-      await uniCloud.callFunction({
-        name: 'user-sync',
-        data: {
-          action: 'addMoodRecord',
-          openid: user.openid,
-          data: record
-        }
-      })
-    } catch (error) {
-      console.error('心情记录同步失败:', error)
-    }
+    uni.cloud.callFunction({
+      name: 'user-sync',
+      data: {
+        action: 'addMoodRecord',
+        openid: user.openid,
+        data: record
+      }
+    }).catch(console.error)
   }
 }
 
@@ -376,4 +386,5 @@ export function isVip(): boolean {
  */
 export function logout(): void {
   uni.removeStorageSync(USER_KEY)
+  uni.removeStorageSync('openid')
 }
