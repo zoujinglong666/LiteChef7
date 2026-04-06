@@ -2,20 +2,53 @@ import { defineConfig, loadEnv } from 'vite';
 import path from 'node:path';
 import Uni from '@dcloudio/vite-plugin-uni';
 import AutoImport from 'unplugin-auto-import/vite';
-// docs: https://uni-helper.js.org/vite-plugin-uni-pages
 import UniPages from '@uni-helper/vite-plugin-uni-pages';
-// 与 @uni-helper/vite-plugin-uni-pages 插件一起使用
-// docs:https://github.com/uni-helper/vite-plugin-uni-platform?tab=readme-ov-file#readme
 import UniPlatform from '@uni-helper/vite-plugin-uni-platform';
-// docs:https://github.com/uni-helper/vite-plugin-uni-manifest?tab=readme-ov-file#readme
 import UniManifest from '@uni-helper/vite-plugin-uni-manifest';
-// docs:https://github.com/uni-helper/vite-plugin-uni-layouts?tab=readme-ov-file#readme
 import UniLayouts from '@uni-helper/vite-plugin-uni-layouts';
-// docs:https://github.com/antfu/vite-plugin-restart?tab=readme-ov-file#readme
 import ViteRestart from 'vite-plugin-restart';
-// docs https://github.com/vbenjs/vite-plugin-vue-setup-extend
 import vueSetupExtend from 'vite-plugin-vue-setup-extend';
 import legacy from '@vitejs/plugin-legacy';
+import { copyFileSync, mkdirSync, existsSync } from 'node:fs';
+
+// 复制 cloudfunctions 到输出目录
+function copyCloudFunctions() {
+  return {
+    name: 'copy-cloud-functions',
+    closeBundle() {
+      const src = path.resolve(process.cwd(), 'cloudfunctions')
+      const dest = path.resolve(process.cwd(), 'dist/dev/mp-weixin/cloudfunctions')
+      
+      if (!existsSync(src)) {
+        console.log('⚠️ cloudfunctions 目录不存在，跳过复制')
+        return
+      }
+      
+      // 创建目标目录
+      if (!existsSync(dest)) {
+        mkdirSync(dest, { recursive: true })
+      }
+      
+      // 复制所有云函数
+      const fs = require('fs')
+      const srcDir = fs.readdirSync(src)
+      srcDir.forEach(item => {
+        const srcPath = path.join(src, item)
+        const destPath = path.join(dest, item)
+        if (fs.statSync(srcPath).isDirectory()) {
+          fs.mkdirSync(destPath, { recursive: true })
+          const subFiles = fs.readdirSync(srcPath)
+          subFiles.forEach(sub => {
+            fs.copyFileSync(path.join(srcPath, sub), path.join(destPath, sub))
+          })
+        } else {
+          fs.copyFileSync(srcPath, destPath)
+        }
+      })
+      console.log('✅ cloudfunctions 已复制到 dist')
+    }
+  }
+}
 
 // https://vitejs.dev/config/
 export default async({ mode }) => {
@@ -83,8 +116,10 @@ export default async({ mode }) => {
       vueSetupExtend(),
 
       ViteRestart({
-        restart: ['vite.config.ts'], // 监听vite.config.js文件修改,无需重启
+        restart: ['vite.config.ts'],
       }),
+      
+      copyCloudFunctions(),
     ],
     define: {
       __UNI_PLATFORM__: JSON.stringify(UNI_PLATFORM),
