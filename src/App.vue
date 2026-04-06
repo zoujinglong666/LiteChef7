@@ -1,8 +1,53 @@
 <script setup lang="ts">
 import { initUser, pullFromCloud } from '@/utils/auth'
 
+// 检查小程序版本更新
+function checkForUpdate() {
+  if (typeof uni.getUpdateManager === 'undefined') {
+    console.log('非微信环境，跳过版本检查')
+    return
+  }
+  
+  const updateManager = uni.getUpdateManager()
+  
+  // 检查是否有新版本
+  updateManager.onCheckForUpdate((res) => {
+    if (res.hasUpdate) {
+      console.log('有新版本可用')
+    }
+  })
+  
+  // 新版本下载完成
+  updateManager.onUpdateReady(() => {
+    uni.showModal({
+      title: '更新提示',
+      content: '新版本已准备好，是否重启应用？',
+      confirmText: '立即更新',
+      cancelText: '稍后',
+      success: (res) => {
+        if (res.confirm) {
+          updateManager.applyUpdate()
+        }
+      }
+    })
+  })
+  
+  // 新版本下载失败
+  updateManager.onUpdateFailed(() => {
+    uni.showModal({
+      title: '更新失败',
+      content: '新版本下载失败，请检查网络后重试',
+      confirmText: '知道了',
+      showCancel: false
+    })
+  })
+}
+
 onLaunch(async () => {
   console.log('App Launch')
+  
+  // 检查版本更新
+  checkForUpdate()
   
   // 初始化用户（微信登录 + 云同步）
   try {

@@ -138,7 +138,14 @@ function showAllHistory() { uni.showToast({ title: `共${moodHistory.value.lengt
 function showAllFav() { uni.showToast({ title: `共${favorites.value.length}条`, icon: 'none' }) }
 function removeFav(name: string) { uni.showModal({ title: '取消收藏', content: `确定取消「${name}」？`, success: (res) => { if (res.confirm) { removeFavorite(name); refresh(); uni.showToast({ title: '已取消', icon: 'none' }) } } }) }
 function openVip() { uni.showModal({ title: '👑 心情会员', content: '会员专属：\n• 每日心情深度分析\n• 专属疗愈菜谱套餐\n• 历史健康报告\n• 无广告\n• 云端数据同步\n\n每月¥9.9，即将上线~', confirmText: '期待', showCancel: false }) }
-function showAbout() { uni.showModal({ title: '🍳 7天轻厨 v3.0', content: '版本3.0.0\n新增：微信登录 + 云同步\n基于AI心情分析的智能菜谱小程序\n© 2026 7天轻厨', confirmText: '知道了', showCancel: false }) }
+function showAbout() { 
+  uni.showModal({ 
+    title: '🍳 7天轻厨 v3.0', 
+    content: '版本 3.0.0\n\n功能亮点：\n• 心情选菜，AI智能推荐\n• 菜谱广场，UGC社区\n• 厨友圈，社交分享\n• 每周挑战赛，游戏化运营\n• 云同步，跨设备数据\n\n© 2026 7天轻厨', 
+    confirmText: '知道了', 
+    showCancel: false 
+  }) 
+}
 
 onShow(() => { refresh() })
 </script>
