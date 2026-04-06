@@ -7,7 +7,7 @@ function initCloud() {
   
   try {
     wx.cloud.init({
-      env: 'LiteChef7-xxxx', // TODO: 替换为实际云环境ID
+      env: 'cloud1-2grw3bbx061c1340',
       traceUser: true
     })
     console.log('☁️ 微信云开发已初始化')
