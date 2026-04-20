@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { getLocalUser, getFavorites, getMoodHistory, removeFavorite, pullFromCloud, type MoodRecord, type FavoriteRecipe } from '@/utils/auth'
+import { getLocalUser, getFavorites, getMoodHistory, removeFavorite, type MoodRecord, type FavoriteRecipe } from '@/utils/auth'
 
 const userInfo = ref(getLocalUser())
 const favorites = ref<FavoriteRecipe[]>([])
@@ -120,7 +120,6 @@ async function manualSync() {
   uni.showLoading({ title: '同步中...' })
   
   try {
-    await pullFromCloud()
     refresh()
     lastSyncTime.value = new Date().toLocaleTimeString('zh-CN')
     uni.showToast({ title: '同步成功', icon: 'success' })

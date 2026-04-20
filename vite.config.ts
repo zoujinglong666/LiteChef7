@@ -9,47 +9,7 @@ import UniLayouts from '@uni-helper/vite-plugin-uni-layouts';
 import ViteRestart from 'vite-plugin-restart';
 import vueSetupExtend from 'vite-plugin-vue-setup-extend';
 import legacy from '@vitejs/plugin-legacy';
-import { copyFileSync, mkdirSync, existsSync } from 'node:fs';
 
-// 复制 cloudfunctions 和字体到输出目录
-function copyAssets() {
-  return {
-    name: 'copy-assets',
-    closeBundle() {
-      const fs = require('fs')
-      const path = require('path')
-      
-      // 复制 cloudfunctions
-      const cfSrc = path.resolve(process.cwd(), 'cloudfunctions')
-      const cfDest = path.resolve(process.cwd(), 'dist/dev/mp-weixin/cloudfunctions')
-      if (fs.existsSync(cfSrc)) {
-        if (!fs.existsSync(cfDest)) fs.mkdirSync(cfDest, { recursive: true })
-        fs.readdirSync(cfSrc).forEach(item => {
-          const srcPath = path.join(cfSrc, item)
-          const destPath = path.join(cfDest, item)
-          if (fs.statSync(srcPath).isDirectory()) {
-            fs.mkdirSync(destPath, { recursive: true })
-            fs.readdirSync(srcPath).forEach(sub => fs.copyFileSync(path.join(srcPath, sub), path.join(destPath, sub)))
-          } else {
-            fs.copyFileSync(srcPath, destPath)
-          }
-        })
-        console.log('✅ cloudfunctions 已复制')
-      }
-      
-      // 复制字体到 static
-      const fontsSrc = path.resolve(process.cwd(), 'src/static/fonts')
-      const fontsDest = path.resolve(process.cwd(), 'dist/dev/mp-weixin/static/fonts')
-      if (fs.existsSync(fontsSrc)) {
-        if (!fs.existsSync(fontsDest)) fs.mkdirSync(fontsDest, { recursive: true })
-        fs.readdirSync(fontsSrc).forEach(f => {
-          fs.copyFileSync(path.join(fontsSrc, f), path.join(fontsDest, f))
-        })
-        console.log('✅ 字体已复制')
-      }
-    }
-  }
-}
 
 // https://vitejs.dev/config/
 export default async({ mode }) => {
@@ -119,8 +79,6 @@ export default async({ mode }) => {
       ViteRestart({
         restart: ['vite.config.ts'],
       }),
-      
-      copyAssets(),
     ],
     define: {
       __UNI_PLATFORM__: JSON.stringify(UNI_PLATFORM),

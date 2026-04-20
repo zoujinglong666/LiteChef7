@@ -1,13 +1,9 @@
 import { defineUniPages } from '@uni-helper/vite-plugin-uni-pages';
-import { name } from './package.json';
 
-/**
- * 全局配置
- */
 export default defineUniPages({
   globalStyle: {
     navigationStyle: 'custom',
-    navigationBarTitleText: name,
+    navigationBarTitleText: 'LiteChef',
     navigationBarBackgroundColor: '#FF6B35',
     navigationBarTextStyle: 'white',
     backgroundColor: '#FFFAF6',
@@ -16,7 +12,6 @@ export default defineUniPages({
     autoscan: true,
     custom: {
       '^wd-(.*)': 'wot-design-uni/components/wd-$1/wd-$1.vue',
-      '^su-(.*)': '@/components/su-$1.vue'
     },
   },
   tabBar: {
