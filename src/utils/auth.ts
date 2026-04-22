@@ -1,15 +1,18 @@
 /**
  * 用户认证模块
- * 使用 Spring Boot 后端
+ * 支持微信静默登录 + 后端 JWT
  */
 
-import { wxLogin, devLogin } from '@/apis/serverApi'
+import { request } from '@/apis/serverApi'
 
 export interface UserInfo {
+  id?: number
   openid: string
   nickname?: string
   avatar?: string
-  createTime: string
+  createTime?: string
+  isVip?: boolean
+  vipExpireTime?: string
   moodHistory: MoodRecord[]
   favorites: FavoriteRecipe[]
 }
@@ -25,10 +28,12 @@ export interface MoodRecord {
 
 export interface FavoriteRecipe {
   name: string
-  image: string
-  ingredients?: string | string[]
+  image?: string
+  coverImage?: string
+  emoji?: string
+  ingredients?: string | string[] | { name: string; amount: string }[]
   time?: string
-  steps?: string[]
+  steps?: string[] | { order: number; content: string }[]
   tips?: string
   suitableScene?: string
   mood?: string
@@ -38,47 +43,122 @@ const USER_KEY = 'user_info'
 const TOKEN_KEY = 'token'
 
 /**
- * 用户登录
+ * 微信静默登录
+ * 自动获取 code 并调用后端登录
  */
-export async function login(): Promise<UserInfo> {
+export async function silentLogin(): Promise<UserInfo> {
   try {
-    // 开发模式使用模拟登录
-    if (import.meta.env.DE_MODE) {
-      const result: any = await devLogin()
-      if (result.success) {
-        uni.setStorageSync(TOKEN_KEY, result.token)
-        const user = createLocalUser(result.openid)
-        saveLocalUser(user)
-        return user
-      }
+    // 1. 检查本地是否已登录
+    const localUser = getLocalUser()
+    const token = uni.getStorageSync(TOKEN_KEY)
+    
+    if (localUser && token) {
+      console.log('✅ 本地已有登录信息，跳过登录')
+      return localUser
     }
 
-    // 生产模式使用微信登录
-    const loginRes: any = await new Promise((resolve, reject) => {
-      wx.login({
+    // 2. 判断环境
+    // #ifdef MP-WEIXIN
+    console.log('🔹 微信小程序环境，执行静默登录...')
+    
+    // 获取微信 code
+    const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
+      uni.login({
         success: resolve,
         fail: reject
       })
     })
-
-    if (!loginRes.code) {
-      throw new Error('微信登录失败')
-    }
-
-    const result: any = await wxLogin(loginRes.code)
     
-    if (result.success) {
-      uni.setStorageSync(TOKEN_KEY, result.token)
-      const user = createLocalUser(result.openid)
+    if (!loginRes.code) {
+      throw new Error('微信登录失败：无法获取code')
+    }
+    
+    console.log('🔹 获取到微信 code:', loginRes.code)
+    
+    // 调用后端登录
+    const result: any = await request('/auth/login', {
+      method: 'POST',
+      data: { code: loginRes.code }
+    })
+    
+    if (result?.code === 200 && result.data) {
+      const { token, openid, userId, nickname, avatar } = result.data
+      
+      // 保存 token
+      uni.setStorageSync(TOKEN_KEY, token)
+      
+      // 构建用户信息
+      const user: UserInfo = {
+        id: userId,
+        openid,
+        nickname: nickname || '厨友',
+        avatar: avatar || '👨‍🍳',
+        moodHistory: localUser?.moodHistory || [],
+        favorites: localUser?.favorites || []
+      }
+      
       saveLocalUser(user)
+      console.log('✅ 微信静默登录成功:', user)
+      
       return user
     }
-
-    throw new Error(result.message || '登录失败')
+    
+    throw new Error(result?.message || '登录失败')
+    
+    // #endif
+    
+    // #ifndef MP-WEIXIN
+    // 非微信环境，使用开发模式登录
+    console.log('🔹 非微信环境，使用开发模式登录...')
+    return await devLogin()
+    // #endif
     
   } catch (error: any) {
-    console.error('❌ 登录失败:', error)
-    // 降级到本地模式
+    console.error('❌ 静默登录失败:', error)
+    
+    // 降级：创建本地用户
+    const fallbackUser = createLocalUser('local_' + Date.now())
+    saveLocalUser(fallbackUser)
+    console.log('⚠️ 降级到本地用户模式')
+    
+    return fallbackUser
+  }
+}
+
+export const login = silentLogin
+
+/**
+ * 开发模式登录
+ */
+export async function devLogin(): Promise<UserInfo> {
+  try {
+    const result: any = await request('/auth/dev-login', { method: 'POST' })
+    
+    if (result?.code === 200 && result.data) {
+      const { token, openid, userId, nickname, avatar } = result.data
+      
+      uni.setStorageSync(TOKEN_KEY, token)
+      
+      const user: UserInfo = {
+        id: userId,
+        openid,
+        nickname: nickname || '厨友',
+        avatar: avatar || '👨‍🍳',
+        moodHistory: [],
+        favorites: []
+      }
+      
+      saveLocalUser(user)
+      console.log('✅ 开发模式登录成功:', user)
+      
+      return user
+    }
+    
+    throw new Error(result?.message || '登录失败')
+  } catch (error: any) {
+    console.error('❌ 开发模式登录失败:', error)
+    
+    // 降级
     const user = createLocalUser('local_' + Date.now())
     saveLocalUser(user)
     return user
@@ -105,11 +185,14 @@ export function saveLocalUser(user: UserInfo): void {
 }
 
 /**
- * 创建本地用户
+ * 创建本地用户（降级用）
  */
 function createLocalUser(openid: string): UserInfo {
   return {
+    id: Date.now(), // 使用时间戳作为临时 ID
     openid,
+    nickname: '厨友',
+    avatar: '👨‍🍳',
     createTime: new Date().toLocaleString('zh-CN'),
     moodHistory: [],
     favorites: []
@@ -165,8 +248,7 @@ export function removeFavorite(name: string): void {
  * 是否已收藏
  */
 export function isFavorited(name: string): boolean {
-  const user = getLocalUser()
-  return user?.favorites.some(f => f.name === name) || false
+  return getLocalUser()?.favorites.some(f => f.name === name) || false
 }
 
 /**

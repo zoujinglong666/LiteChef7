@@ -27,9 +27,8 @@ export interface MoodRecommendResponse {
  */
 export async function getRecommendByMood(
   moodName: string,
-  moodKeyword: string,
-  weather?: string,
-  cuisine?: string
+  cuisine?: string,
+  weather?: string
 ): Promise<MoodRecommendResponse> {
   try {
     const result: any = await request('/mood/recommend', {
@@ -41,9 +40,12 @@ export async function getRecommendByMood(
       }
     })
 
+    // 兼容后端返回 {code, data, message} 或直接 {reason, recipes}
+    const payload = result.data || result
+
     // 添加 emoji
     const foodEmojis = ['🍳','🥘','🍲','🥗','🍜','🍛','🥟','🍝','🍱','🥩','🍖','🦐','🥚','🥬','🍰']
-    const recipes: Recipe[] = (result.recipes || []).map((r: any, i: number) => ({
+    const recipes: Recipe[] = (payload.recipes || []).map((r: any, i: number) => ({
       name: r.name || '美味菜谱',
       image: r.image || foodEmojis[i % foodEmojis.length],
       description: r.description || '一道温暖的美食',
@@ -56,7 +58,7 @@ export async function getRecommendByMood(
     }))
 
     return {
-      reason: result.reason || `根据你的心情，推荐这几道菜~`,
+      reason: payload.reason || `根据你的心情，推荐这几道菜~`,
       recipes
     }
     

@@ -1,9 +1,7 @@
-import { request } from '@/utils/request';
-export const getChannel = (params: any) => {
-  return request({
-    url: `/station/v1/channel/base/tree`,
-    method: 'get',
-    params,
-    loading: true,
-  });
-};
+/**
+ * API 入口文件
+ */
+
+export * from './request'
+export * from './recipe'
+export * from './auth'

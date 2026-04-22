@@ -66,39 +66,49 @@
       </view>
 
       <!-- 推荐卡片 -->
-      <view v-else-if="recommendResult" class="recommend-card">
+      <view v-else-if="recommendResult?.recipes?.length" class="recommend-body">
         <!-- 推荐理由 -->
         <view class="reason-box">
-          <text class="reason-emoji">💬</text>
+          <view class="reason-icon">💬</view>
           <text class="reason-text">{{ recommendResult.reason }}</text>
         </view>
 
         <!-- 菜谱列表 -->
         <view class="recipe-list">
           <view
-            class="recipe-item"
+            class="recipe-card"
             v-for="(recipe, i) in recommendResult.recipes"
             :key="i"
             @click="goDetail(recipe)"
           >
-            <view class="recipe-left">
+            <view class="recipe-image-wrap">
               <text class="recipe-emoji">{{ recipe.image }}</text>
-              <view class="cuisine-badge">{{ recipe.cuisine || selectedCuisine }}</view>
+              <view class="recipe-overlay">
+                <view class="cuisine-badge">{{ recipe.cuisine || selectedCuisine }}</view>
+                <view class="recipe-meta" v-if="(recipe.steps || []).length">
+                  <text class="meta-text">{{ recipe.steps.length }} 步</text>
+                </view>
+              </view>
             </view>
-            <view class="recipe-right">
+            <view class="recipe-info">
               <view class="recipe-header">
                 <text class="recipe-name">{{ recipe.name }}</text>
                 <text class="fav-btn" @click.stop="toggleFav(recipe)">
-                  <wd-icon :name="isFav(recipe.name) ? 'heart-filled' : 'heart'" size="18px" :color="isFav(recipe.name) ? '#FF6B35' : '#999'" />
+                  <wd-icon :name="isFav(recipe.name) ? 'heart-filled' : 'heart'" size="18px" :color="isFav(recipe.name) ? '#FF6B35' : '#ccc'" />
                 </text>
               </view>
               <text class="recipe-desc">{{ recipe.description }}</text>
-              <text class="recipe-ingredients">{{ (recipe.ingredients || []).slice(0,3).join(' · ') }}</text>
+              <view class="recipe-ingredients">
+                <text class="ing-tag" v-for="(ing, idx) in (recipe.ingredients || []).slice(0,3)" :key="idx">{{ ing }}</text>
+              </view>
               <view class="recipe-footer">
                 <view class="recipe-tags">
                   <text class="tag" v-for="t in recipe.tags.slice(0,2)" :key="t">{{ t }}</text>
                 </view>
-                <text class="detail-link">查看步骤</text>
+                <view class="detail-link">
+                  <text>查看步骤</text>
+                  <text class="arrow">→</text>
+                </view>
               </view>
             </view>
           </view>
@@ -106,8 +116,8 @@
 
         <!-- 操作栏 -->
         <view class="action-bar">
-          <button class="btn-refresh" @click="refresh">换一批</button>
-          <button class="btn-save" @click="saveAll">全部收藏</button>
+          <button class="btn-refresh" @click="refresh">🔄 换一批</button>
+          <button class="btn-save" @click="saveAll">❤️ 全部收藏</button>
         </view>
       </view>
 
@@ -116,6 +126,12 @@
         <text class="error-emoji">😅</text>
         <text class="error-text">{{ errorMsg }}</text>
         <button class="retry-btn" @click="refresh">重试一下</button>
+      </view>
+
+      <!-- 无数据 -->
+      <view v-else class="empty-hint">
+        <text class="hint-emoji">🍽️</text>
+        <text class="hint-text">暂无推荐，换个心情试试</text>
       </view>
     </view>
 
@@ -131,10 +147,11 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { getRecommendByMood, type CuisineType } from '@/apis/moodApi'
+import { getRecommendByMood } from '@/apis/moodApi'
 import { login, addMoodRecord, addFavorite, removeFavorite, getFavorites, type MoodRecord } from '@/utils/auth'
 
 // 菜式列表
+type CuisineType = '中式' | '日式' | '西式' | '韩式'
 const cuisineList = [
   { key: '中式' as CuisineType, icon: '🥢' },
   { key: '日式' as CuisineType, icon: '🍣' },
@@ -255,9 +272,6 @@ async function fetchRecommend(mood: typeof moodList[0]) {
     await login()
     const result = await getRecommendByMood(
       mood.name,
-      mood.desc,
-      weatherDesc.value || weatherText.value,
-      temperature.value,
       selectedCuisine.value
     )
     recommendResult.value = result
@@ -289,8 +303,12 @@ function isFav(name: string) { return favorites.value.has(name) }
 
 // 跳转详情页
 function goDetail(recipe: any) {
-  const data = encodeURIComponent(JSON.stringify(recipe))
-  uni.navigateTo({ url: `/pages/recipeDetail/index?data=${data}` })
+  if (recipe.id) {
+    uni.navigateTo({ url: `/pages/recipeDetail/index?id=${recipe.id}` })
+  } else {
+    const data = encodeURIComponent(JSON.stringify(recipe))
+    uni.navigateTo({ url: `/pages/recipeDetail/index?data=${data}` })
+  }
 }
 
 async function toggleFav(recipe: any) {
@@ -344,15 +362,21 @@ function saveAll() {
 <style scoped>
 .mood-page {
   min-height: 100vh;
-  background: #FFFAF6;
+  background: #FFF8F3;
   padding-bottom: 140rpx;
 }
 
 /* 顶部 */
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   background: linear-gradient(135deg, #FF9E4D 0%, #FF6B35 100%);
-  padding: 90rpx 50rpx 50rpx;
-  border-radius: 0 0 60rpx 60rpx;
+  padding: 90rpx 40rpx 50rpx;
+  border-radius: 0 0 50rpx 50rpx;
+  box-shadow: 0 8rpx 32rpx rgba(255,107,53,0.25);
 }
 
 .header-top {
@@ -369,11 +393,12 @@ function saveAll() {
   background: rgba(255,255,255,0.25);
   padding: 10rpx 24rpx;
   border-radius: 30rpx;
+  backdrop-filter: blur(4rpx);
 }
 
 .weather-icon { font-size: 30rpx; }
-.weather-text { font-size: 24rpx; color: #fff; }
-.header-date { font-size: 24rpx; color: rgba(255,255,255,0.8); }
+.weather-text { font-size: 24rpx; color: #fff; font-weight: 500; }
+.header-date { font-size: 24rpx; color: rgba(255,255,255,0.85); font-weight: 500; }
 
 .header-title {
   display: block;
@@ -381,16 +406,18 @@ function saveAll() {
   font-weight: bold;
   color: #fff;
   margin-bottom: 12rpx;
+  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
 }
 
 .header-sub {
   font-size: 26rpx;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.9);
 }
 
 /* 菜式选择器 */
 .cuisine-section {
   padding: 30rpx 30rpx 0;
+  padding-top: 360rpx;
 }
 
 .cuisine-scroll {
@@ -403,31 +430,33 @@ function saveAll() {
   display: flex;
   align-items: center;
   gap: 10rpx;
-  padding: 16rpx 30rpx;
-  background: #fff;
+  padding: 16rpx 32rpx;
+  background: #FFF0E8;
   border-radius: 40rpx;
   border: 3rpx solid transparent;
   white-space: nowrap;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.06);
+  box-shadow: 0 4rpx 16rpx rgba(255,107,53,0.08);
   flex-shrink: 0;
+  transition: all 0.2s;
 }
 
 .cuisine-chip.active {
-  background: #FFF0E8;
-  border-color: #FF6B35;
+  background: linear-gradient(135deg, #FF9E4D, #FF6B35);
+  border-color: transparent;
+  box-shadow: 0 6rpx 20rpx rgba(255,107,53,0.3);
 }
 
 .cuisine-icon { font-size: 32rpx; }
-.cuisine-name { font-size: 26rpx; color: #555; font-weight: 500; }
-.cuisine-chip.active .cuisine-name { color: #FF6B35; font-weight: bold; }
+.cuisine-name { font-size: 26rpx; color: #FF6B35; font-weight: 600; }
+.cuisine-chip.active .cuisine-name { color: #fff; font-weight: bold; }
 
 /* 心情网格 */
 .mood-section {
   margin: 24rpx 30rpx 0;
   background: #fff;
   border-radius: 32rpx;
-  padding: 36rpx;
-  box-shadow: 0 4rpx 24rpx rgba(255,107,53,0.1);
+  padding: 32rpx;
+  box-shadow: 0 4rpx 24rpx rgba(255,107,53,0.08);
 }
 
 .mood-grid {
@@ -444,13 +473,14 @@ function saveAll() {
   background: #FFF9F5;
   border-radius: 20rpx;
   border: 3rpx solid transparent;
+  transition: all 0.2s;
 }
 
 .mood-card.active {
-  background: #FFF0E8;
+  background: linear-gradient(135deg, #FFF0E8, #FFE5D6);
   border-color: #FF6B35;
-  transform: scale(1.04);
-  box-shadow: 0 4rpx 16rpx rgba(255,107,53,0.2);
+  transform: scale(1.05);
+  box-shadow: 0 6rpx 20rpx rgba(255,107,53,0.2);
 }
 
 .mood-icon { font-size: 52rpx; margin-bottom: 10rpx; }
@@ -470,99 +500,135 @@ function saveAll() {
   box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.04);
 }
 
-.loading-anim { margin-bottom: 24rpx; }
+.loading-anim { margin-bottom: 24rpx; animation: bounce 1s infinite; }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16rpx); }
+}
 .loading-emoji { font-size: 100rpx; }
 .loading-text { display: block; font-size: 30rpx; color: #555; font-weight: bold; margin-bottom: 12rpx; }
 .loading-sub { font-size: 24rpx; color: #bbb; }
 
-/* 推荐卡片 */
-.recommend-card {
-  background: #fff;
-  border-radius: 32rpx;
-  padding: 36rpx;
-  box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.06);
-}
-
+/* 推荐理由 */
 .reason-box {
   display: flex;
+  align-items: flex-start;
   background: linear-gradient(135deg, #FFF9F5, #FFF0E8);
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   padding: 28rpx;
   margin-bottom: 28rpx;
-  align-items: flex-start;
   border-left: 8rpx solid #FF9E4D;
+  box-shadow: 0 4rpx 16rpx rgba(255,107,53,0.08);
 }
 
-.reason-emoji { font-size: 36rpx; margin-right: 14rpx; flex-shrink: 0; }
-.reason-text { font-size: 28rpx; color: #666; line-height: 1.8; flex: 1; }
-
-/* 菜谱列表 */
-.recipe-list { display: flex; flex-direction: column; gap: 20rpx; }
-
-.recipe-item {
-  display: flex;
-  background: #FAFAFA;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  position: relative;
-}
-
-.recipe-item:active { opacity: 0.85; }
-
-.recipe-left {
-  width: 110rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10rpx;
+.reason-icon {
+  font-size: 36rpx;
+  margin-right: 16rpx;
   flex-shrink: 0;
-  margin-right: 20rpx;
-}
-
-.recipe-emoji {
-  font-size: 64rpx;
-  background: #FFF5E6;
-  width: 110rpx;
-  height: 110rpx;
-  border-radius: 20rpx;
+  background: #fff;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  line-height: 110rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.06);
+}
+.reason-text { font-size: 28rpx; color: #555; line-height: 1.7; flex: 1; font-weight: 500; }
+
+/* 菜谱卡片列表 */
+.recipe-list { display: flex; flex-direction: column; gap: 28rpx; }
+
+.recipe-card {
+  background: #fff;
+  border-radius: 28rpx;
+  overflow: hidden;
+  box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.06);
+  transition: transform 0.2s;
+}
+.recipe-card:active { transform: scale(0.98); }
+
+.recipe-image-wrap {
+  position: relative;
+  height: 280rpx;
+  background: linear-gradient(135deg, #FFE8D6, #FFD4BA);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-emoji {
+  font-size: 120rpx;
+  filter: drop-shadow(0 4rpx 12rpx rgba(0,0,0,0.1));
+}
+
+.recipe-overlay {
+  position: absolute;
+  bottom: 16rpx;
+  left: 16rpx;
+  right: 16rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .cuisine-badge {
-  font-size: 18rpx;
-  color: #FF6B35;
-  background: #FFF0E8;
-  padding: 4rpx 12rpx;
-  border-radius: 10rpx;
-  white-space: nowrap;
+  font-size: 20rpx;
+  color: #fff;
+  background: rgba(0,0,0,0.35);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  backdrop-filter: blur(4rpx);
+  font-weight: 500;
 }
 
-.recipe-right { flex: 1; display: flex; flex-direction: column; }
+.recipe-meta {
+  font-size: 20rpx;
+  color: #fff;
+  background: rgba(0,0,0,0.35);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  backdrop-filter: blur(4rpx);
+  font-weight: 500;
+}
+
+.recipe-info {
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+}
 
 .recipe-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8rpx;
+  margin-bottom: 10rpx;
 }
 
-.recipe-name { font-size: 30rpx; font-weight: bold; color: #333; }
-.fav-btn { font-size: 36rpx; }
+.recipe-name { font-size: 32rpx; font-weight: bold; color: #222; }
+.fav-btn { padding: 8rpx; }
 
 .recipe-desc {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #FF6B35;
-  margin-bottom: 8rpx;
+  margin-bottom: 14rpx;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .recipe-ingredients {
-  font-size: 22rpx;
-  color: #aaa;
-  margin-bottom: 12rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 16rpx;
+}
+
+.ing-tag {
+  font-size: 20rpx;
+  color: #666;
+  background: #F5F5F5;
+  padding: 6rpx 14rpx;
+  border-radius: 12rpx;
 }
 
 .recipe-footer {
@@ -571,26 +637,31 @@ function saveAll() {
   align-items: center;
 }
 
-.recipe-tags { display: flex; gap: 8rpx; }
+.recipe-tags { display: flex; gap: 10rpx; }
 .tag {
-  font-size: 18rpx;
+  font-size: 20rpx;
   color: #FF6B35;
   background: #FFF0E8;
-  padding: 4rpx 12rpx;
+  padding: 6rpx 14rpx;
   border-radius: 16rpx;
+  font-weight: 500;
 }
 
 .detail-link {
-  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
   color: #FF6B35;
-  font-weight: 500;
+  font-weight: 600;
 }
+.detail-link .arrow { font-size: 22rpx; }
 
 /* 操作栏 */
 .action-bar {
   display: flex;
   gap: 20rpx;
-  margin-top: 28rpx;
+  margin-top: 32rpx;
 }
 
 .btn-refresh, .btn-save {
@@ -601,10 +672,17 @@ function saveAll() {
   border-radius: 50rpx;
   border: none;
   text-align: center;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08);
+  transition: transform 0.1s;
 }
+.btn-refresh:active, .btn-save:active { transform: scale(0.96); }
 
 .btn-refresh { background: #F5F5F5; color: #666; }
-.btn-save { background: linear-gradient(135deg, #FF9E4D, #FF6B35); color: #fff; }
+.btn-save {
+  background: linear-gradient(135deg, #FF9E4D, #FF6B35);
+  color: #fff;
+  box-shadow: 0 6rpx 20rpx rgba(255,107,53,0.3);
+}
 
 /* 错误 */
 .error-box {
@@ -612,6 +690,7 @@ function saveAll() {
   border-radius: 32rpx;
   padding: 60rpx;
   text-align: center;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.04);
 }
 
 .error-emoji { font-size: 80rpx; display: block; margin-bottom: 20rpx; }
@@ -623,6 +702,7 @@ function saveAll() {
   border-radius: 40rpx;
   padding: 20rpx 60rpx;
   font-size: 28rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255,107,53,0.25);
 }
 
 /* 空状态 */

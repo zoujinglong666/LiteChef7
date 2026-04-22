@@ -1,121 +1,102 @@
 <route lang="json">
 {
-"style": { "navigationBarTitleText": "食记" },
-"name": "node"
+  "layout": "default",
+  "style": { "navigationStyle": "custom" },
+  "name": "node"
 }
 </route>
 
 <template>
-  <view class="page">
-    <!-- 编辑模式提示 -->
+  <view class="node-page">
+    <!-- 顶部 -->
+    <view class="header">
+      <view class="header-bg" />
+      <view class="nav-bar">
+        <view class="back-btn" @click="goBack">
+          <wd-icon name="chevron-left" size="20px" color="#fff" />
+        </view>
+        <text class="nav-title">{{ isEdit ? '编辑食记' : '发布食记' }}</text>
+        <view class="nav-right" />
+      </view>
+    </view>
+
+    <!-- 编辑提示 -->
     <view v-if="isEdit" class="edit-tip">
-      <wd-icon name="edit" size="14" color="#8d6e63" />
-      当前为 <text class="highlight">编辑模式</text>，修改内容后点击提交保存
+      <wd-icon name="edit" size="14px" color="#FF6B35" />
+      <text>当前为编辑模式，修改后点击保存</text>
     </view>
 
-    <!-- 卡片内容 -->
-    <view class="card">
-      <wd-form ref="form" :model="model">
-        <wd-cell-group border>
-          <!-- 菜名 -->
-          <wd-textarea
-            label="菜名"
-            label-width="80px"
-            prop="name"
-            v-model="model.name"
-            placeholder="请输入菜名"
-            clearable
-            auto-height
-            :rules="[{ required: true, message: '请输入菜名' }]"
-          />
+    <!-- 表单 -->
+    <view class="form-section">
+      <!-- 菜名 -->
+      <view class="form-item">
+        <text class="form-label">菜名 *</text>
+        <input
+          type="text"
+          v-model="model.name"
+          placeholder="请输入菜名"
+          class="form-input"
+        />
+      </view>
 
-          <!-- 图片上传 -->
-          <view class="image-upload-section">
-            <view class="upload-label">
-              <wd-icon name="image" size="16" color="#8d6e63" />
-              菜品图片
+      <!-- 图片上传 -->
+      <view class="form-item">
+        <text class="form-label">菜品图片</text>
+        <view class="image-grid">
+          <view v-for="(image, index) in model.images" :key="index" class="image-item">
+            <image :src="image" class="uploaded-image" mode="aspectFill" @click="previewImage(index)" />
+            <view class="delete-btn" @click="removeImage(index)">
+              <wd-icon name="close" size="12px" color="#fff" />
             </view>
-            <view class="image-container">
-              <view
-                v-for="(image, index) in model.images"
-                :key="index"
-                class="image-item"
-              >
-                <image :src="image" class="uploaded-image" mode="aspectFill" @click="previewImage(index)" />
-                <view class="delete-btn" @click="removeImage(index)">
-                  <wd-icon name="close" size="10" color="#fff" />
-                </view>
-              </view>
-
-              <!-- 添加图片按钮 -->
-              <view
-                v-if="model.images.length < 9"
-                class="upload-btn"
-                @click="chooseImage"
-              >
-                <wd-icon name="add" size="20" />
-                <text>添加图片</text>
-              </view>
-            </view>
-            <text class="upload-tip">最多可上传9张图片</text>
           </view>
+          <view v-if="model.images.length < 9" class="upload-btn" @click="chooseImage">
+            <wd-icon name="add" size="24px" color="#CCC" />
+            <text class="upload-text">添加图片</text>
+          </view>
+        </view>
+        <text class="upload-tip">最多可上传9张图片</text>
+      </view>
 
-          <!-- 备注 -->
-          <wd-textarea
-            label="备注"
-            label-width="80px"
-            prop="remark"
-            v-model="model.remark"
-            placeholder="分享你的烹饪心得、小贴士或美食故事..."
-            clearable
-            show-word-limit
-            :maxlength="500"
-            auto-height
-          />
-        </wd-cell-group>
-      </wd-form>
+      <!-- 备注 -->
+      <view class="form-item">
+        <text class="form-label">备注</text>
+        <textarea
+          v-model="model.remark"
+          placeholder="分享你的烹饪心得、小贴士或美食故事..."
+          class="form-textarea"
+          :maxlength="500"
+        />
+      </view>
     </view>
 
-    <!-- 底部按钮 -->
+    <!-- 提交按钮 -->
     <view class="footer">
-      <wd-button
-        type="primary"
-        size="large"
-        @click="handleSubmit"
-        block
-        class="submit-btn"
-      >
+      <button class="submit-btn" @click="handleSubmit">
         {{ isEdit ? '更新分享' : '发布分享' }}
-      </wd-button>
+      </button>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import eventBus from '@/utils/eventBus';
-import { formatToDateTime } from '@/utils/dateUtils';
+import eventBus from '@/utils/eventBus'
 
 const model = reactive({
   name: '',
   remark: '',
-  images: [] as string[],
-});
+  images: [] as string[]
+})
 
-const editItem = ref<any>(null);
-const isEdit = ref(false);
+const editItem = ref<any>(null)
+const isEdit = ref(false)
 
-onLoad((query) => {
+onLoad((query: any) => {
   if (query.item) {
-    editItem.value = JSON.parse(query.item);
-    Object.assign(model, editItem.value || {});
-    isEdit.value = true;
-  } else {
-    editItem.value = {};
-    isEdit.value = false;
+    editItem.value = JSON.parse(query.item)
+    Object.assign(model, editItem.value)
+    isEdit.value = true
   }
-});
-
-const form = ref();
+})
 
 function chooseImage() {
   uni.chooseImage({
@@ -123,125 +104,193 @@ function chooseImage() {
     sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
     success: (res) => {
-      model.images.push(...res.tempFilePaths);
-    },
-  });
+      model.images.push(...res.tempFilePaths)
+    }
+  })
 }
 
 function removeImage(index: number) {
-  model.images.splice(index, 1);
+  model.images.splice(index, 1)
 }
 
 function previewImage(index: number) {
   uni.previewImage({
     current: model.images[index],
-    urls: model.images,
-  });
+    urls: model.images
+  })
 }
 
 function handleSubmit() {
-  form.value
-    .validate()
-    .then(({ valid }) => {
-      if (valid) {
-        const record = {
-          ...model,
-          createTime: formatToDateTime(new Date()),
-        };
+  if (!model.name.trim()) {
+    uni.showToast({ title: '请输入菜名', icon: 'none' })
+    return
+  }
 
-        const records = uni.getStorageSync('food_records') || [];
+  const record = {
+    ...model,
+    score: 5,
+    createTime: new Date().toLocaleString('zh-CN')
+  }
 
-        if (isEdit.value) {
-          const index = records.findIndex(
-            (item) => item.createTime === editItem.value.createTime,
-          );
-          if (index !== -1) {
-            records[index] = record;
-          }
-          uni.showToast({ title: '更新成功', icon: 'success' });
-        } else {
-          records.unshift(record);
-          uni.showToast({ title: '发布成功', icon: 'success' });
-        }
+  const records = uni.getStorageSync('food_records') || []
 
-        uni.setStorageSync('food_records', records);
+  if (isEdit.value) {
+    const index = records.findIndex((item: any) => item.createTime === editItem.value.createTime)
+    if (index !== -1) {
+      records[index] = record
+    }
+    uni.showToast({ title: '更新成功', icon: 'success' })
+  } else {
+    records.unshift(record)
+    uni.showToast({ title: '发布成功', icon: 'success' })
+  }
 
-        nextTick(() => {
-          model.name = '';
-          model.remark = '';
-          model.images = [];
-          uni.navigateBack();
-          eventBus.emit('refreshNodeList');
-        });
-      }
-    })
-    .catch((error) => {
-      console.log(error, 'validate error');
-    });
+  uni.setStorageSync('food_records', records)
+
+  nextTick(() => {
+    model.name = ''
+    model.remark = ''
+    model.images = []
+    uni.navigateBack()
+    eventBus.emit('refreshNodeList')
+  })
+}
+
+function goBack() {
+  uni.navigateBack()
 }
 </script>
 
 <style scoped>
-.page {
-  padding: 16px;
+.node-page {
+  min-height: 100vh;
+  background: #F8F9FA;
+  padding-bottom: 140rpx;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200rpx;
+  background: linear-gradient(135deg, #FF9E4D, #FF6B35);
+}
+
+.nav-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 100rpx 40rpx 20rpx;
+}
+
+.back-btn {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.nav-right {
+  width: 64rpx;
 }
 
 .edit-tip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 16px;
-  padding: 8px 14px;
-  font-size: 14px;
-  color: #8d6e63;
-  background: rgba(241, 224, 205, 0.7);
-  border-radius: 30px;
-  box-shadow: 0 2px 8px rgba(141, 110, 99, 0.1);
+  gap: 12rpx;
+  padding: 20rpx 30rpx;
+  background: #FFF0E8;
+  margin: 20rpx 30rpx;
+  margin-top: 220rpx;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  color: #FF6B35;
 }
 
-.highlight {
-  font-weight: 600;
+.form-section {
+  padding: 0 30rpx;
+  padding-top: 20rpx;
 }
 
-.card {
+.form-item {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
 }
 
-.upload-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  color: #5d4037;
-  margin-bottom: 10px;
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
 }
 
-.image-container {
+.form-input {
+  width: 100%;
+  font-size: 28rpx;
+  padding: 20rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 200rpx;
+  font-size: 28rpx;
+  padding: 20rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+}
+
+.image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
 }
 
 .image-item {
   position: relative;
-  border-radius: 10px;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16rpx;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 .uploaded-image {
   width: 100%;
-  height: 72px;
+  height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .delete-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 20px;
-  height: 20px;
-  background: rgba(0,0,0,0.55);
+  top: 8rpx;
+  right: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(0,0,0,0.5);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -249,29 +298,28 @@ function handleSubmit() {
 }
 
 .upload-btn {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #F5F5F5;
+  border: 2rpx dashed #CCC;
+  border-radius: 16rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 72px;
-  width: 72px;
-  background: rgba(200, 192, 181, 0.12);
-  border: 1px dashed #b8a79b;
-  border-radius: 10px;
-  color: #9e8f87;
-  font-size: 12px;
-  transition: background 0.2s ease;
 }
 
-.upload-btn:active {
-  background: rgba(200, 192, 181, 0.25);
+.upload-text {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 8rpx;
 }
 
 .upload-tip {
   display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  color: #868e96;
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: #999;
 }
 
 .footer {
@@ -279,25 +327,18 @@ function handleSubmit() {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 12px 20px 28px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 24rpx 30rpx;
+  background: #fff;
 }
 
 .submit-btn {
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 40px;
-  background: linear-gradient(135deg, #d9a7c7 0%, #fffcdc 100%);
-  color: #5d4037;
-  box-shadow: 0 4px 14px rgba(217, 167, 199, 0.25);
-  transition: transform 0.2s ease;
+  width: 100%;
+  background: linear-gradient(135deg, #FF9E4D, #FF6B35);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 28rpx;
+  border-radius: 50rpx;
+  border: none;
 }
-
-.submit-btn:active {
-  transform: scale(0.97);
-}
-
-
 </style>

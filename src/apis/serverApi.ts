@@ -3,7 +3,7 @@
  * 调用 Spring Boot 后端服务
  */
 
-const BASE_URL = 'http://localhost:8080/api'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
@@ -53,12 +53,12 @@ export async function request<T = any>(
  */
 export async function getRecommendByMood(
   mood: string,
-  weather: string,
-  cuisine: string
+  cuisine: string,
+  weather?: string
 ) {
   return request('/mood/recommend', {
     method: 'POST',
-    data: { mood, weather, cuisine }
+    data: { mood, cuisine, weather: weather || '晴' }
   })
 }
 

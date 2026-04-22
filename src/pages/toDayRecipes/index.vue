@@ -1,439 +1,314 @@
 <route lang="json">
 {
-"style": { "navigationBarTitleText": "今日推荐" },
-"name": "toDayRecipes"
+  "layout": "default",
+  "style": { "navigationStyle": "custom" },
+  "name": "toDayRecipes"
 }
 </route>
+
 <template>
   <view class="recipe-page">
-    <!-- 主要内容 -->
-    <scroll-view class="main-content" scroll-y>
-      <!-- 日期信息 -->
-      <view class="date-section">
-        <view class="date-header">
-          <view class="chef-icon">👨‍🍳</view>
-          <text class="date-title">为你推荐</text>
+    <!-- 顶部 -->
+    <view class="header">
+      <view class="header-bg" />
+      <view class="nav-bar">
+        <view class="back-btn" @click="goBack">
+          <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
-        <text class="date-text">{{ formattedDate }} · {{ dayOfWeek }}</text>
-        <text class="date-subtitle">精选美味搭配</text>
+        <text class="nav-title">今日推荐</text>
+        <view class="nav-right" />
       </view>
+    </view>
 
-      <!-- 菜谱卡片列表 -->
-      <view class="recipe-list">
-        <view
-          v-for="(recipe, index) in recipes"
-          :key="recipe.id"
-          class="recipe-card"
-          :class="{ 'loading': isLoading }"
-          @tap="handleRecipeClick(recipe.id)"
-        >
-          <!-- 图片容器 -->
-          <view class="recipe-image-container">
-            <image
-              :src="recipe.image"
-              :alt="recipe.name"
-              class="recipe-image"
-              mode="aspectFill"
-              :class="{ 'opacity-70': isLoading }"
-            />
-            <!-- 时间标签 -->
-            <view class="time-badge">
-              <text class="time-icon">🕐</text>
-              <text class="time-text">{{ recipe.cookTime }}</text>
-            </view>
-            <!-- 渐变遮罩 -->
-            <view class="image-overlay"></view>
+    <!-- 日期信息 -->
+    <view class="date-section">
+      <view class="date-header">
+        <text class="chef-icon">👨‍🍳</text>
+        <text class="date-title">为你推荐</text>
+      </view>
+      <text class="date-text">{{ formattedDate }} · {{ dayOfWeek }}</text>
+      <text class="date-subtitle">精选美味搭配</text>
+    </view>
+
+    <!-- 菜谱列表 -->
+    <view class="recipe-list">
+      <view
+        v-for="recipe in recipes"
+        :key="recipe.id"
+        class="recipe-card"
+        @click="goDetail(recipe)"
+      >
+        <view class="recipe-cover">
+          <text class="cover-emoji">{{ recipe.image }}</text>
+          <view class="time-badge">
+            <text class="time-text">{{ recipe.cookTime || '30分钟' }}</text>
           </view>
-
-          <!-- 内容区域 -->
-          <view class="recipe-content">
-            <text class="recipe-name">{{ recipe.name }}</text>
-
-            <!-- 标签 -->
-            <view class="recipe-tags">
-              <text
-                v-for="(tag, tagIndex) in recipe.tags"
-                :key="tagIndex"
-                class="recipe-tag"
-              >
-                {{ tag }}
-              </text>
-            </view>
-
-            <!-- 难度和描述 -->
-            <view class="recipe-meta">
-              <view class="difficulty-stars">
-                <text
-                  v-for="i in 5"
-                  :key="i"
-                  class="star"
-                  :class="{ 'star-filled': i <= recipe.difficulty }"
-                >
-                  ★
-                </text>
-                <text class="difficulty-text">难度</text>
-              </view>
-              <text class="recipe-description">{{ recipe.description }}</text>
-            </view>
+        </view>
+        <view class="recipe-content">
+          <text class="recipe-name">{{ recipe.name }}</text>
+          <text class="recipe-desc">{{ recipe.description }}</text>
+          <view class="recipe-tags">
+            <text class="recipe-tag" v-for="(tag, i) in (recipe.tags || []).slice(0, 2)" :key="i">{{ tag }}</text>
           </view>
         </view>
       </view>
+    </view>
 
-      <!-- 换一换按钮 -->
-      <view class="shuffle-section">
-        <button
-          class="shuffle-button"
-          :class="{ 'loading': isLoading }"
-          :disabled="isLoading"
-          @tap="handleShuffle"
-        >
-          <text class="shuffle-icon  sn-icon-park-outline:refresh" :class="{ 'rotating': isLoading }" >
-          </text>
-          <text class="shuffle-text">{{ isLoading ? '正在换菜...' : '换一换' }}</text>
-        </button>
-        <text class="shuffle-tip">每次为你推荐不同的美味组合</text>
-      </view>
-
-      <!-- 底部安全区域 -->
-      <view class="safe-area-bottom"></view>
-    </scroll-view>
+    <!-- 换一换按钮 -->
+    <view class="shuffle-section">
+      <button class="shuffle-btn" :disabled="isLoading" @click="handleShuffle">
+        <wd-icon name="refresh" size="18px" :class="{ rotating: isLoading }" />
+        <text>{{ isLoading ? '正在换菜...' : '换一换' }}</text>
+      </button>
+      <text class="shuffle-tip">每次为你推荐不同的美味组合</text>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { getTodayRecipes, getRandomRecipes, type Recipe } from '@/utils/recipes'
-import { getDayOfWeek, getFormattedDate } from '@/utils/dateUtils'
-const recipes = ref<Recipe[]>([])
+import { getTodayRecipes, getRandomRecipes } from '@/utils/recipes'
+
+const recipes = ref<any[]>([])
 const isLoading = ref(false)
-const statusBarHeight = ref(0)
 
-const dayOfWeek = computed(() => getDayOfWeek())
-const formattedDate = computed(() => getFormattedDate())
+const dayOfWeek = computed(() => {
+  const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+  return days[new Date().getDay()]
+})
 
-const handleRecipeClick = (id: string) => {
-  const recipe = recipes.value.find(r => r.id === id)
-  console.log(`跳转到菜谱详情页: ${recipe?.name}`)
+const formattedDate = computed(() => {
+  const d = new Date()
+  return `${d.getMonth() + 1}月${d.getDate()}日`
+})
 
-  // 使用recipe.url跳转到下厨房页面
-  if (recipe) {
-    const recipeUrl = allRecipesData.find(item => item.url.includes(id))?.url
-    if (recipeUrl) {
-      uni.navigateTo({
-        url: `/pages/recipeDetail/index?url=${encodeURIComponent(recipeUrl)}`
-      })
-    } else {
-      uni.showToast({
-        title: '菜谱链接不存在',
-        icon: 'none'
-      })
-    }
-  }
-}
+onMounted(() => {
+  recipes.value = getTodayRecipes(5)
+})
 
-const handleShuffle = () => {
+function handleShuffle() {
   if (isLoading.value) return
-
   isLoading.value = true
-
-  // 添加触觉反馈
   uni.vibrateShort()
 
   setTimeout(() => {
-    recipes.value = getRandomRecipes(2)
+    recipes.value = getRandomRecipes(5)
     isLoading.value = false
-
-    // 添加提示
-    uni.showToast({
-      title: '已为您更新菜谱',
-      icon: 'none'
-    })
+    uni.showToast({ title: '已更新', icon: 'none' })
   }, 800)
 }
 
-const handleBack = () => {
-  console.log('返回上一页')
+function goDetail(recipe: any) {
+  if (recipe.id) {
+    uni.navigateTo({ url: `/pages/recipeDetail/index?id=${recipe.id}` })
+  } else {
+    const data = encodeURIComponent(JSON.stringify(recipe))
+    uni.navigateTo({ url: `/pages/recipeDetail/index?data=${data}` })
+  }
+}
+
+function goBack() {
   uni.navigateBack()
 }
-
-const handleMore = () => {
-  console.log('更多选项')
-  uni.showActionSheet({
-    itemList: ['分享给朋友', '收藏菜谱', '设置提醒'],
-    success: (res) => {
-      console.log('选中了第' + (res.tapIndex + 1) + '个按钮')
-    }
-  })
-}
-
-onMounted(() => {
-  // 获取系统信息
-  uni.getSystemInfo({
-    success: (res) => {
-      statusBarHeight.value = res.statusBarHeight || 0
-    }
-  })
-
-  // 初始化菜谱数据
-  recipes.value = getTodayRecipes()
-})
 </script>
 
 <style scoped>
 .recipe-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fef7f0 0%, #fdf2f8 100%);
+  background: #F8F9FA;
 }
 
-
-/* 主要内容 */
-/*padding-top: 88px; /* 状态栏 + 导航栏高度 */
-.main-content {
-  height: 100vh;
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  overflow: hidden;
 }
 
-/* 日期信息 */
+.header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200rpx;
+  background: linear-gradient(135deg, #FF9E4D, #FF6B35);
+}
+
+.nav-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 100rpx 40rpx 20rpx;
+}
+
+.back-btn {
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.nav-right {
+  width: 64rpx;
+}
+
 .date-section {
   text-align: center;
-  padding: 24px 16px;
+  padding: 40rpx 30rpx;
+  margin-top: 200rpx;
 }
 
 .date-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .chef-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
-  font-size: 16px;
+  font-size: 32rpx;
+  margin-right: 12rpx;
 }
 
 .date-title {
-  font-size: 20px;
+  font-size: 36rpx;
   font-weight: bold;
-  color: #1e293b;
+  color: #333;
 }
 
 .date-text {
   display: block;
-  font-size: 16px;
-  font-weight: 500;
-  color: #64748b;
-  margin-bottom: 4px;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
 }
 
 .date-subtitle {
-  font-size: 14px;
-  color: #94a3b8;
+  font-size: 24rpx;
+  color: #999;
 }
 
-/* 菜谱列表 */
-/* 菜谱列表 */
 .recipe-list {
-  padding: 0 12px;
-  margin-bottom: 24px;
+  padding: 0 30rpx;
 }
 
 .recipe-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  background: #fff;
+  border-radius: 24rpx;
   overflow: hidden;
-  margin-bottom: 12px;
-  transition: all 0.3s;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
 }
 
-.recipe-card:active {
-  transform: scale(0.98);
-}
-
-.recipe-card.loading {
-  opacity: 0.7;
-}
-
-.recipe-image-container {
+.recipe-cover {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10; /* 稍微调整比例 */
-  overflow: hidden;
+  height: 300rpx;
+  background: #FFF5E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.recipe-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.cover-emoji {
+  font-size: 120rpx;
 }
 
 .time-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 14px;
-  padding: 4px 8px;
-  display: flex;
-  align-items: center;
-}
-
-.time-icon {
-  font-size: 12px;
-  margin-right: 3px;
+  top: 20rpx;
+  right: 20rpx;
+  background: rgba(0,0,0,0.5);
+  border-radius: 20rpx;
+  padding: 8rpx 16rpx;
 }
 
 .time-text {
-  font-size: 12px;
-  font-weight: 500;
-  color: white;
+  font-size: 22rpx;
+  color: #fff;
 }
 
-.image-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.25));
-}
-
-/* 内容区域 */
 .recipe-content {
-  padding: 14px;
+  padding: 24rpx;
 }
 
 .recipe-name {
   display: block;
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: bold;
-  color: #1e293b;
-  margin-bottom: 8px;
-  line-height: 1.3;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.recipe-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+  line-height: 1.5;
 }
 
 .recipe-tags {
-  margin-bottom: 10px;
+  display: flex;
+  gap: 12rpx;
 }
 
 .recipe-tag {
-  display: inline-block;
-  background: linear-gradient(135deg, #fed7aa 0%, #fecaca 100%);
-  color: #ea580c;
-  font-size: 10px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 12px;
-  margin-right: 6px;
-  margin-bottom: 6px;
-  border: 1px solid rgba(253, 186, 116, 0.5);
+  font-size: 22rpx;
+  color: #FF6B35;
+  background: #FFF0E8;
+  padding: 6rpx 16rpx;
+  border-radius: 16rpx;
 }
 
-.recipe-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.difficulty-stars {
-  display: flex;
-  align-items: center;
-}
-
-.star {
-  font-size: 14px;
-  color: #d1d5db;
-  margin-right: 1px;
-}
-
-.star-filled {
-  color: #fbbf24;
-}
-
-.difficulty-text {
-  font-size: 12px;
-  color: #64748b;
-  margin-left: 3px;
-}
-
-.recipe-description {
-  font-size: 12px;
-  color: #94a3b8;
-  line-height: 1.4;
-  margin-top: 6px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 换一换按钮 */
 .shuffle-section {
-  padding: 0 16px;
+  padding: 30rpx;
   text-align: center;
 }
 
-.shuffle-button {
+.shuffle-btn {
   width: 100%;
-  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  padding: 8px;
-  border-radius: 16px;
+  background: linear-gradient(135deg, #FF9E4D, #FF6B35);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 28rpx;
+  border-radius: 50rpx;
   border: none;
-  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
+  gap: 12rpx;
 }
 
-.shuffle-button:active {
-  transform: scale(0.98);
-}
-
-.shuffle-button.loading {
-  opacity: 0.7;
-}
-
-.shuffle-icon {
-  margin-right: 8px;
-  color: white;
-  transition: transform 0.3s;
-}
-
-.shuffle-icon.rotating {
-  animation: rotate 1s linear infinite;
-}
-
-.shuffle-text {
-  font-size: 18px;
-  font-weight: 600;
+.shuffle-btn[disabled] {
+  opacity: 0.6;
 }
 
 .shuffle-tip {
-  font-size: 14px;
-  color: #94a3b8;
+  display: block;
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #999;
 }
 
-.safe-area-bottom {
-  height: 32px;
+.rotating {
+  animation: rotate 1s linear infinite;
 }
 
 @keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

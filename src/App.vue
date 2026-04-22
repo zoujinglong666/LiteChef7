@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
-import { login, getLocalUser } from '@/utils/auth'
+import { silentLogin, getLocalUser } from '@/utils/auth'
 
 onLaunch(async () => {
-  console.log('App Launch')
+  console.log('🚀 App Launch')
   
-  // 初始化用户
+  // 自动静默登录
   try {
-    await login()
-    console.log('✅ 用户初始化成功')
+    const user = await silentLogin()
+    console.log('✅ 静默登录成功:', user.nickname, user.openid)
   } catch (error) {
-    console.error('❌ 用户初始化失败:', error)
+    console.error('❌ 静默登录失败:', error)
   }
 })
 
 onShow(() => {
-  console.log('App Show')
+  console.log('📱 App Show')
 })
 
 onHide(() => {
-  console.log('App Hide')
+  console.log('📴 App Hide')
 })
 </script>
 
@@ -28,6 +28,4 @@ onHide(() => {
 page {
   background-color: #FFFAF6;
 }
-
-/* 移除云函数相关样式 */
 </style>

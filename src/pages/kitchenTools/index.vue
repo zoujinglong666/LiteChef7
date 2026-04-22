@@ -145,7 +145,11 @@ function goBack() {
 }
 
 .header {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   overflow: hidden;
 }
 
@@ -187,8 +191,7 @@ function goBack() {
 
 .tools-list {
   padding: 0 30rpx;
-  margin-top: -30rpx;
-  position: relative;
+  padding-top: 330rpx;
 }
 
 .tool-card {

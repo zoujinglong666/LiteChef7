@@ -69,6 +69,10 @@ export default async({ mode }) => {
             from: 'uni-mini-router',
             imports: ['createRouter', 'useRouter', 'useRoute'],
           },
+          {
+            from: '@/composables',
+            imports: ['useSystemInfo', 'useDebounce', 'useThrottle', 'useList'],
+          },
         ],
         dts: 'src/types/auto-import.d.ts',
         eslintrc: { enabled: true, globalsPropValue: true },

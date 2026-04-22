@@ -239,20 +239,20 @@ function goBack() { uni.navigateBack() }
   align-items: center;
   gap: 8rpx;
   padding: 16rpx 32rpx;
-  background: #fff;
+  background: #FFF0E8;
   border-radius: 40rpx;
   margin-right: 16rpx;
   border: 3rpx solid transparent;
 }
 
 .category-item.active {
-  background: #FFF0E8;
-  border-color: #FF6B35;
+  background: linear-gradient(135deg, #FF9E4D, #FF6B35);
+  border-color: transparent;
 }
 
 .cat-icon { font-size: 28rpx; }
-.cat-name { font-size: 26rpx; color: #666; }
-.category-item.active .cat-name { color: #FF6B35; font-weight: bold; }
+.cat-name { font-size: 26rpx; color: #FF6B35; }
+.category-item.active .cat-name { color: #fff; font-weight: bold; }
 
 /* 比例列表 */
 .ratio-list {

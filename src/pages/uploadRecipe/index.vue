@@ -8,10 +8,9 @@
 
 <template>
   <view class="upload-page">
-    <!-- 顶部 -->
     <view class="header">
       <view class="header-bg" />
-      <view class="nav-bar">
+      <view class="nav-bar" :style="{ paddingTop: navBarPaddingTop }">
         <view class="back-btn" @click="goBack">
           <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
@@ -19,55 +18,54 @@
         <view class="nav-right" />
       </view>
     </view>
-    
-    <!-- 表单 -->
+
     <view class="form-section">
       <!-- 菜名 -->
       <view class="form-item">
         <text class="form-label">菜名 *</text>
         <input type="text" v-model="form.name" placeholder="例如：番茄炒蛋" class="form-input" />
       </view>
-      
+
       <!-- 简介 -->
       <view class="form-item">
         <text class="form-label">简介</text>
         <textarea v-model="form.description" placeholder="介绍一下这道菜..." class="form-textarea" />
       </view>
-      
+
       <!-- 菜式 -->
       <view class="form-item">
         <text class="form-label">菜式</text>
         <view class="option-list">
-          <view 
-            v-for="c in cuisines" 
-            :key="c" 
-            class="option-item" 
-            :class="{ active: form.cuisine === c }" 
+          <view
+            v-for="c in cuisines"
+            :key="c"
+            class="option-item"
+            :class="{ active: form.cuisine === c }"
             @click="form.cuisine = c"
           >{{ c }}</view>
         </view>
       </view>
-      
+
       <!-- 难度 -->
       <view class="form-item">
         <text class="form-label">难度</text>
         <view class="option-list">
-          <view 
-            v-for="d in difficulties" 
-            :key="d" 
-            class="option-item" 
-            :class="{ active: form.difficulty === d }" 
+          <view
+            v-for="d in difficulties"
+            :key="d"
+            class="option-item"
+            :class="{ active: form.difficulty === d }"
             @click="form.difficulty = d"
           >{{ d }}</view>
         </view>
       </view>
-      
+
       <!-- 烹饪时间 -->
       <view class="form-item">
         <text class="form-label">烹饪时间</text>
         <input type="text" v-model="form.cookTime" placeholder="例如：30分钟" class="form-input" />
       </view>
-      
+
       <!-- 食材 -->
       <view class="form-item">
         <view class="form-header">
@@ -85,7 +83,7 @@
           </view>
         </view>
       </view>
-      
+
       <!-- 步骤 -->
       <view class="form-item">
         <view class="form-header">
@@ -103,21 +101,14 @@
           </view>
         </view>
       </view>
-      
+
       <!-- 小贴士 -->
       <view class="form-item">
         <text class="form-label">小贴士</text>
         <textarea v-model="form.tips" placeholder="分享一些烹饪技巧..." class="form-textarea" />
       </view>
-      
-      <!-- 标签 -->
-      <view class="form-item">
-        <text class="form-label">标签</text>
-        <input type="text" v-model="tagsInput" placeholder="用空格分隔，如：家常菜 快手 减脂" class="form-input" />
-      </view>
     </view>
-    
-    <!-- 提交按钮 -->
+
     <view class="submit-section">
       <button class="submit-btn" :disabled="submitting" @click="handleSubmit">
         {{ submitting ? '发布中...' : '发布菜谱' }}
@@ -127,7 +118,12 @@
 </template>
 
 <script setup lang="ts">
+import { request } from '@/apis/serverApi'
 import { getLocalUser } from '@/utils/auth'
+
+// 获取系统状态栏高度
+const statusBarHeight = ref(0)
+const navBarPaddingTop = computed(() => `${statusBarHeight.value + 12}px`)
 
 const cuisines = ['中式', '日式', '西式', '韩式', '东南亚', '其他']
 const difficulties = ['简单', '中等', '困难']
@@ -143,8 +139,13 @@ const form = ref({
   tips: ''
 })
 
-const tagsInput = ref('')
 const submitting = ref(false)
+
+onMounted(() => {
+  // 获取状态栏高度
+  const systemInfo = uni.getSystemInfoSync()
+  statusBarHeight.value = systemInfo.statusBarHeight || 0
+})
 
 function addIngredient() {
   form.value.ingredients.push({ name: '', amount: '' })
@@ -167,68 +168,57 @@ function removeStep(index: number) {
 }
 
 async function handleSubmit() {
-  // 验证
   if (!form.value.name.trim()) {
     uni.showToast({ title: '请输入菜名', icon: 'none' })
     return
   }
-  
+
   const validIngredients = form.value.ingredients.filter(i => i.name.trim())
   if (validIngredients.length === 0) {
     uni.showToast({ title: '请添加食材', icon: 'none' })
     return
   }
-  
+
   const validSteps = form.value.steps.filter(s => s.content.trim())
   if (validSteps.length === 0) {
     uni.showToast({ title: '请添加步骤', icon: 'none' })
     return
   }
-  
+
   const user = getLocalUser()
-  if (!user) {
+  if (!user?.openid) {
     uni.showToast({ title: '请先登录', icon: 'none' })
     return
   }
-  
+
   submitting.value = true
-  
+
   try {
-    const tags = tagsInput.value.split(/\s+/).filter(t => t.trim())
-    
-    const result = await uni.cloud.callFunction({
-      name: 'recipe-crud',
+    // 使用 userId (优先) 或 openid
+    const userIdParam = user.id || user.openid
+    const res = await request<any>('/recipe/create?userId=' + userIdParam, {
+      method: 'POST',
       data: {
-        action: 'create',
-        openid: user.openid,
-        data: {
-          name: form.value.name,
-          description: form.value.description,
-          cuisine: form.value.cuisine,
-          difficulty: form.value.difficulty,
-          cookTime: form.value.cookTime,
-          ingredients: validIngredients,
-          steps: validSteps.map((s, i) => ({ order: i + 1, content: s.content })),
-          tips: form.value.tips,
-          tags,
-          authorInfo: {
-            nickname: user.nickname || '厨友',
-            avatar: user.avatar || '👤'
-          }
-        }
+        name: form.value.name,
+        description: form.value.description,
+        cuisine: form.value.cuisine,
+        difficulty: form.value.difficulty,
+        cookTime: form.value.cookTime,
+        ingredients: validIngredients,
+        steps: validSteps.map((s, i) => ({ order: i + 1, content: s.content })),
+        tips: form.value.tips
       }
-    }) as any
-    
-    if (result.result?.code === 200) {
+    })
+
+    if (res?.code === 200) {
       uni.showToast({ title: '发布成功', icon: 'success' })
       setTimeout(() => {
         uni.navigateBack()
       }, 1500)
     } else {
-      uni.showToast({ title: result.result?.message || '发布失败', icon: 'none' })
+      uni.showToast({ title: res?.message || '发布失败', icon: 'none' })
     }
-  } catch (error) {
-    console.error('发布失败:', error)
+  } catch {
     uni.showToast({ title: '发布失败', icon: 'none' })
   } finally {
     submitting.value = false
@@ -243,14 +233,14 @@ function goBack() {
 <style scoped>
 .upload-page { min-height: 100vh; background: #F8F9FA; }
 
-.header { position: relative; overflow: hidden; }
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; overflow: hidden; }
 .header-bg { position: absolute; top: 0; left: 0; right: 0; height: 200rpx; background: linear-gradient(135deg, #FF9E4D, #FF6B35); }
-.nav-bar { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 100rpx 40rpx 20rpx; }
+.nav-bar { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 0 40rpx 20rpx; }
 .back-btn { width: 64rpx; height: 64rpx; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .nav-title { font-size: 34rpx; font-weight: bold; color: #fff; }
 .nav-right { width: 64rpx; }
 
-.form-section { padding: 30rpx; }
+.form-section { padding: 30rpx; padding-top: 230rpx; }
 .form-item { background: #fff; border-radius: 20rpx; padding: 30rpx; margin-bottom: 20rpx; }
 .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
 .form-label { display: block; font-size: 28rpx; font-weight: bold; color: #333; margin-bottom: 20rpx; }

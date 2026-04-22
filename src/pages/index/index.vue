@@ -149,7 +149,7 @@ const onCancel = () => {
 const current = ref<number>(0)
 const swiperList = ref([])
 
-// 功能导航
+// 功能导航 - 只保留有效页面
 const featureItems = [
   {
     icon: '😊',
@@ -164,21 +164,21 @@ const featureItems = [
     bgColor: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)'
   },
   {
-    icon: '🍛',
-    title: '下饭菜',
-    url: '/pages/riceDishes/index',
+    icon: '🛒',
+    title: '逛菜',
+    url: '/pages/shopFood/index',
     bgColor: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)'
   },
   {
-    icon: '🥗',
-    title: '健康餐',
-    url: '/pages/healthyFood/index',
+    icon: '🍳',
+    title: '菜谱广场',
+    url: '/pages/recipeSquare/index',
     bgColor: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)'
   },
   {
-    icon: 'clock',
-    title: '快手菜',
-    url: '/pages/quickRecipes/index',
+    icon: '🔧',
+    title: '工具箱',
+    url: '/pages/kitchenTools/index',
     bgColor: 'linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%)'
   }
 ]
@@ -242,18 +242,24 @@ function copyLink(url: string) {
 
 // 查看菜谱详情
 function viewRecipeDetail(item: any) {
-  copyLink(item.url)
-
-  uni.navigateTo({
-    url: `/pages/recipeDetail/index?url=${encodeURIComponent(item.url)}`
-  })
+  const id = item.id
+  if (id) {
+    uni.navigateTo({
+      url: `/pages/recipeDetail/index?id=${id}`
+    })
+  } else if (item.url) {
+    copyLink(item.url)
+    uni.navigateTo({
+      url: `/pages/recipeDetail/index?url=${encodeURIComponent(item.url)}`
+    })
+  }
 }
 
 // 轮播图点击
 function handleRecipeClick(e) {
   const index = e.current || current.value
   const recipe = getTodayRecipes(5)[index]
-  if (recipe && recipe.url) {
+  if (recipe) {
     viewRecipeDetail(recipe)
   }
 }
