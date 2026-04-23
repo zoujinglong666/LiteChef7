@@ -12,7 +12,7 @@ export interface Recipe {
   description?: string
   ingredients?: string[]
   steps?: string[]
-  tips?: string[]
+  tips?: string[] | string
   suitableScene?: string
   image?: string
   emoji?: string

@@ -31,9 +31,9 @@ export async function addFavorite(userId: number, data: {
 }) {
   const res: any = await request('/favorite/add', {
     method: 'POST',
-    data: { ...data },
+    data: { ...data, userId },
     header: { 'Content-Type': 'application/json' }
-  }, userId)
+  })
   return res.data || res
 }
 
@@ -80,9 +80,9 @@ export async function getDietProfile(userId: number): Promise<DietProfile> {
 export async function saveDietProfile(userId: number, data: Partial<DietProfile>) {
   const res: any = await request('/user/profile', {
     method: 'POST',
-    data,
+    data: { ...data, userId },
     header: { 'Content-Type': 'application/json' }
-  }, userId)
+  })
   return res.data || res
 }
 

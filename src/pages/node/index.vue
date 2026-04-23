@@ -107,7 +107,7 @@ function chooseImage() {
     sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
     success: (res) => {
-      model.images.push(...res.tempFilePaths)
+      model.images.push(...(res.tempFilePaths as string[]))
     }
   })
 }

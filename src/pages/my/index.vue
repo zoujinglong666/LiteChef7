@@ -137,7 +137,7 @@
     </view>
 
     <!-- 饮食偏好 -->
-    <view class="section-card" @click="navigateTo('/pages/dietProfile/index')">
+    <view class="section-card" @click="goTo('/pages/dietProfile/index')">
       <view class="section-head">
         <view class="section-title-wrapper">
           <text class="section-icon">🍽</text>
@@ -149,7 +149,7 @@
     </view>
 
     <!-- 意见反馈 -->
-    <view class="section-card" @click="navigateTo('/pages/feedback/index')">
+    <view class="section-card" @click="goTo('/pages/feedback/index')">
       <view class="section-head">
         <view class="section-title-wrapper">
           <text class="section-icon">💬</text>
@@ -333,6 +333,10 @@ function handleLogin() {
 
 function showMoodHistory() {
   uni.navigateTo({ url: '/pages/moodHistory/index' })
+}
+
+function goTo(url: string) {
+  uni.navigateTo({ url })
 }
 
 function showFavorites() {
