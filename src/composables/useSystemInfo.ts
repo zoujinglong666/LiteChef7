@@ -24,9 +24,27 @@ export function useSystemInfo() {
     safeAreaBottom: 0
   })
 
-  // 计算导航栏 padding
+  // 计算导航栏 padding（顶部到胶囊底部 + 间距）
   const navBarPaddingTop = computed(() => {
     return `${systemInfo.value.statusBarHeight + 12}px`
+  })
+
+  // 导航栏总高度（状态栏+胶囊区域）
+  const navBarHeight = computed(() => {
+    const menuButtonInfo = uni.getMenuButtonBoundingClientRect?.()
+    if (menuButtonInfo) {
+      return menuButtonInfo.top - systemInfo.value.statusBarHeight + menuButtonInfo.height
+    }
+    return 44
+  })
+
+  // 胶囊按钮底部到屏幕顶的距离（px），用于动态设置 nav-bar padding
+  const capsuleBottomToTop = computed(() => {
+    const menuButtonInfo = uni.getMenuButtonBoundingClientRect?.()
+    if (menuButtonInfo) {
+      return menuButtonInfo.top - systemInfo.value.statusBarHeight + menuButtonInfo.height
+    }
+    return 44
   })
 
   // 胶囊按钮位置计算
@@ -85,6 +103,8 @@ export function useSystemInfo() {
   return {
     systemInfo: readonly(systemInfo),
     navBarPaddingTop,
+    navBarHeight,
+    capsuleBottomToTop,
     capsulePosition,
     initSystemInfo
   }

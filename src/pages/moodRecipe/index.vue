@@ -82,7 +82,11 @@
             @click="goDetail(recipe)"
           >
             <view class="recipe-image-wrap">
-              <text class="recipe-emoji">{{ recipe.image }}</text>
+              <image v-if="recipe.image && recipe.image.startsWith('http')" class="recipe-img" :src="recipe.image" mode="aspectFill" />
+              <text v-else class="recipe-emoji">{{ recipe.image || '🍳' }}</text>
+              <view class="image-loading" v-if="!recipe.image || !recipe.image.startsWith('http')">
+                <view class="loading-spinner" />
+              </view>
               <view class="recipe-overlay">
                 <view class="cuisine-badge">{{ recipe.cuisine || selectedCuisine }}</view>
                 <view class="recipe-meta" v-if="(recipe.steps || []).length">
@@ -146,8 +150,11 @@
 </template>
 
 <script setup lang="ts">
+import { useSystemInfo } from '@/composables'
+const { capsuleBottomToTop } = useSystemInfo()
+
 import { onMounted } from 'vue'
-import { getRecommendByMood } from '@/apis/moodApi'
+import { getRecommendByMood, generateRecipeImage } from '@/apis/moodApi'
 import { login, addMoodRecord, addFavorite, removeFavorite, getFavorites, type MoodRecord } from '@/utils/auth'
 
 // 菜式列表
@@ -278,10 +285,26 @@ async function fetchRecommend(mood: typeof moodList[0]) {
     loading.value = false
     stopLoadingAnim()
     syncFavs()
+    // 逐个异步加载图片
+    loadRecipeImages(result.recipes || [])
   } catch (e: any) {
     loading.value = false
     stopLoadingAnim()
     errorMsg.value = e.message || '推荐失败，请重试'
+  }
+}
+
+/** 逐道菜异步加载AI图片 */
+async function loadRecipeImages(recipes: any[]) {
+  for (const recipe of recipes) {
+    try {
+      const imageUrl = await generateRecipeImage(recipe.name)
+      if (imageUrl) {
+        recipe.image = imageUrl
+        // 触发响应式更新
+        recommendResult.value = { ...recommendResult.value! }
+      }
+    } catch {}
   }
 }
 
@@ -560,6 +583,35 @@ function saveAll() {
 .recipe-emoji {
   font-size: 120rpx;
   filter: drop-shadow(0 4rpx 12rpx rgba(0,0,0,0.1));
+}
+
+.recipe-img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.image-loading {
+  position: absolute;
+  bottom: 16rpx;
+  right: 16rpx;
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.loading-spinner {
+  width: 36rpx;
+  height: 36rpx;
+  border: 4rpx solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .recipe-overlay {

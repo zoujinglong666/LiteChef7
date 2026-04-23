@@ -11,7 +11,7 @@
     <!-- 顶部 -->
     <view class="header">
       <view class="header-bg" />
-      <view class="nav-bar" :style="{ paddingTop: navBarPaddingTop }">
+      <view class="nav-bar" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
         <text class="nav-title">厨友圈</text>
         <view class="nav-actions">
           <view class="action-btn" @click="showPostModal = true">
@@ -85,10 +85,9 @@
 <script setup lang="ts">
 import { request } from '@/apis/serverApi'
 import { getLocalUser } from '@/utils/auth'
+import { useSystemInfo } from '@/composables'
 
-// 获取系统状态栏高度
-const statusBarHeight = ref(0)
-const navBarPaddingTop = computed(() => `${statusBarHeight.value + 12}px`)
+const { capsuleBottomToTop } = useSystemInfo()
 
 const activeTab = ref('feed')
 const posts = ref<any[]>([])
@@ -101,10 +100,6 @@ const newPost = ref({
 })
 
 onMounted(() => {
-  // 获取状态栏高度
-  const systemInfo = uni.getSystemInfoSync()
-  statusBarHeight.value = systemInfo.statusBarHeight || 0
-
   loadPosts()
 })
 

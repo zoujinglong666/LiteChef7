@@ -136,6 +136,29 @@
       </scroll-view>
     </view>
 
+    <!-- 饮食偏好 -->
+    <view class="section-card" @click="navigateTo('/pages/dietProfile/index')">
+      <view class="section-head">
+        <view class="section-title-wrapper">
+          <text class="section-icon">🍽</text>
+          <text class="section-title">饮食偏好</text>
+        </view>
+        <view class="diet-badge" v-if="hasDietProfile">已设置</view>
+      </view>
+      <text class="section-desc">设置忌口和疾病限制，AI推荐更精准</text>
+    </view>
+
+    <!-- 意见反馈 -->
+    <view class="section-card" @click="navigateTo('/pages/feedback/index')">
+      <view class="section-head">
+        <view class="section-title-wrapper">
+          <text class="section-icon">💬</text>
+          <text class="section-title">意见反馈</text>
+        </view>
+      </view>
+      <text class="section-desc">Bug反馈、功能建议、好评投诉都欢迎</text>
+    </view>
+
     <!-- 厨房工具 -->
     <view class="section-card">
       <view class="section-head">
@@ -177,6 +200,7 @@ import {
   type FavoriteRecipe,
   type UserInfo
 } from '@/utils/auth'
+import { getDietProfile } from '@/apis/dietApi'
 
 // 系统信息
 const { navBarPaddingTop } = useSystemInfo()
@@ -192,6 +216,7 @@ const favorites = ref<FavoriteRecipe[]>([])
 const moodHistory = ref<MoodRecord[]>([])
 const streak = ref(0)
 const syncing = ref(false)
+const hasDietProfile = ref(false)
 
 // 计算属性
 const isLoggedIn = computed(() => checkLogin())
@@ -311,7 +336,7 @@ function showMoodHistory() {
 }
 
 function showFavorites() {
-  uni.navigateTo({ url: '/pages/favorites/index' })
+  uni.navigateTo({ url: '/pages/favoriteList/index' })
 }
 
 function showHistoryDetail(item: MoodRecord) {
@@ -329,7 +354,7 @@ function showAllHistory() {
 }
 
 function showAllFav() {
-  uni.navigateTo({ url: '/pages/favorites/index' })
+  uni.navigateTo({ url: '/pages/favoriteList/index' })
 }
 
 function removeFav(name: string) {
@@ -365,20 +390,25 @@ function openVip() {
 }
 
 function showAbout() {
-  uni.showModal({
-    title: '🍳 7天轻厨 v3.0',
-    content: '版本 3.0.0\n\n功能亮点：\n• 心情选菜，AI智能推荐\n• 菜谱广场，UGC社区\n• 厨友圈，社交分享\n• 每周挑战赛，游戏化运营\n• 云同步，跨设备数据\n\n© 2026 7天轻厨',
-    confirmText: '知道了',
-    showCancel: false
-  })
+  uni.navigateTo({ url: '/pages/about/index' })
 }
 
 onShow(() => {
   refresh()
 })
 
-onMounted(() => {
+onMounted(async () => {
   refresh()
+  const user = getLocalUser()
+  if (user?.id) {
+    try {
+      const profile = await getDietProfile((user.id as any) || 1)
+      hasDietProfile.value = !!(
+        profile.dislikeIngredients || profile.diseaseRestrictions ||
+        profile.flavorPreference || profile.cookingSkill
+      )
+    } catch {}
+  }
 })
 </script>
 

@@ -10,7 +10,7 @@
   <view class="page">
     <!-- 顶部 -->
     <view class="header">
-      <view class="nav-bar">
+      <view class="nav-bar" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
         <view class="back-btn" @click="goBack"><wd-icon name="chevron-left" size="20px" color="#fff" /></view>
         <text class="nav-title">调料比例表</text>
         <view class="nav-right" />
@@ -60,6 +60,9 @@
 </template>
 
 <script setup lang="ts">
+import { useSystemInfo } from '@/composables'
+const { capsuleBottomToTop } = useSystemInfo()
+
 const activeCategory = ref('sauce')
 
 const categories = [

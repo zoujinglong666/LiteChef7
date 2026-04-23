@@ -10,7 +10,7 @@
   <view class="page">
     <!-- 顶部 -->
     <view class="header">
-      <view class="nav-bar">
+      <view class="nav-bar" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
         <view class="back-btn" @click="goBack"><wd-icon name="chevron-left" size="20px" color="#fff" /></view>
         <text class="nav-title">分量计算器</text>
         <view class="nav-right" />
@@ -98,6 +98,9 @@
 </template>
 
 <script setup lang="ts">
+import { useSystemInfo } from '@/composables'
+const { capsuleBottomToTop } = useSystemInfo()
+
 const fromPeople = ref(2)
 const toPeople = ref(4)
 

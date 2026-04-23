@@ -11,7 +11,7 @@
     <!-- 顶部 -->
     <view class="header">
       <view class="header-bg" />
-      <view class="nav-bar">
+      <view class="nav-bar" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
         <view class="back-btn" @click="goBack">
           <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
@@ -28,7 +28,7 @@
     </view>
 
     <!-- 内容区 -->
-    <view class="content">
+    <view class="content" :style="{ paddingTop: (capsuleBottomToTop + 188) + 'px' }">
       <!-- 项目简介 -->
       <view class="section">
         <view class="section-header">
@@ -112,6 +112,9 @@
 </template>
 
 <script setup lang="ts">
+import { useSystemInfo } from '@/composables'
+const { capsuleBottomToTop } = useSystemInfo()
+
 function openGithub() {
   uni.setClipboardData({
     data: 'https://github.com/zoujinglong666',

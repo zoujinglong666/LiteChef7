@@ -11,7 +11,7 @@
     <!-- 顶部 -->
     <view class="header">
       <view class="header-bg" />
-      <view class="nav-bar">
+      <view class="nav-bar" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
         <view class="back-btn" @click="goBack">
           <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
@@ -99,6 +99,9 @@
 </template>
 
 <script setup lang="ts">
+import { useSystemInfo } from '@/composables'
+const { capsuleBottomToTop } = useSystemInfo()
+
 import { request } from '@/apis/serverApi'
 
 const searchKeyword = ref('')

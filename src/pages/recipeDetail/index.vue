@@ -13,7 +13,7 @@
       <view class="hero-bg" />
       <view class="hero-bg-2" />
       <!-- 返回按钮 -->
-      <view class="nav-bar">
+      <view class="nav-bar" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
         <view class="back-btn" @click="goBack">
           <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
@@ -166,6 +166,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSystemInfo } from '@/composables'
 import { addFavorite, removeFavorite, getFavorites } from '@/utils/auth'
 import { getRecipeDetail, favoriteRecipe } from '@/apis'
 interface DetailRecipe {
@@ -196,6 +197,7 @@ const recipe = ref<DetailRecipe>({ name: '' })
 const isFaved = ref(false)
 const loading = ref(true)
 const error = ref(false)
+const { capsuleBottomToTop } = useSystemInfo()
 
 onLoad((query: any) => {
   const id = query.id ? Number(query.id) : 0

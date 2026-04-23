@@ -9,7 +9,7 @@
 <template>
   <view class="square-page">
     <!-- 顶部 -->
-    <view class="header" :style="{ paddingTop: navBarPaddingTop }">
+    <view class="header" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
       <view class="header-bg" />
       <view class="nav-bar">
         <text class="nav-title">菜谱广场</text>
@@ -198,7 +198,7 @@ import LoadingState from '@/components/LoadingState.vue'
 import ErrorState from '@/components/ErrorState.vue'
 
 // 系统信息
-const { navBarPaddingTop } = useSystemInfo()
+const { navBarPaddingTop, capsuleBottomToTop } = useSystemInfo()
 
 // 筛选选项
 const filterOptions = [
@@ -222,10 +222,12 @@ const error = ref<Error | null>(null)
 const page = ref(1)
 const pageSize = 10
 
-// Header 高度（用于内容偏移）
+// Header 高度（用于内容偏移，动态适配胶囊按钮）
 const headerHeight = computed(() => {
-  // 基础高度 + 搜索栏 + 筛选标签（预留足够空间避免遮挡）
-  return '420rpx'
+  // 胶囊底部到顶的距离(px) + nav-bar自身高度 + 搜索栏 + 间距，转rpx
+  const extraPx = 92 + 72
+  const totalPx = capsuleBottomToTop.value + extraPx
+  return `${totalPx * 2}rpx`
 })
 
 /**

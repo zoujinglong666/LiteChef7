@@ -10,7 +10,7 @@
   <view class="upload-page">
     <view class="header">
       <view class="header-bg" />
-      <view class="nav-bar" :style="{ paddingTop: navBarPaddingTop }">
+      <view class="nav-bar" :style="{ paddingTop: capsuleBottomToTop + 'px' }">
         <view class="back-btn" @click="goBack">
           <wd-icon name="chevron-left" size="20px" color="#fff" />
         </view>
@@ -120,10 +120,9 @@
 <script setup lang="ts">
 import { request } from '@/apis/serverApi'
 import { getLocalUser } from '@/utils/auth'
+import { useSystemInfo } from '@/composables'
 
-// 获取系统状态栏高度
-const statusBarHeight = ref(0)
-const navBarPaddingTop = computed(() => `${statusBarHeight.value + 12}px`)
+const { capsuleBottomToTop } = useSystemInfo()
 
 const cuisines = ['中式', '日式', '西式', '韩式', '东南亚', '其他']
 const difficulties = ['简单', '中等', '困难']
@@ -140,12 +139,6 @@ const form = ref({
 })
 
 const submitting = ref(false)
-
-onMounted(() => {
-  // 获取状态栏高度
-  const systemInfo = uni.getSystemInfoSync()
-  statusBarHeight.value = systemInfo.statusBarHeight || 0
-})
 
 function addIngredient() {
   form.value.ingredients.push({ name: '', amount: '' })
